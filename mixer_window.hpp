@@ -20,6 +20,7 @@ protected:
 	void drawMixers();
 	void handleInput();
 	bool selectMixer(uint nr);
+    void resize();
 public:
 	MixerWindow(const MixerManager &mgr);
 	~MixerWindow();

@@ -29,33 +29,22 @@
 #include "mixer_device.hpp"
 #include "mixer_window.hpp"
 
-void print_volume(const MixerDevice &device){
-	std::cout << "#" << device.getNumber() << "  " << device.getName() << "  " << device.getVolumeLeft() << ":" << device.getVolumeRight() << std::endl;
+/*
+std::unique_ptr<MixerWindow> window{nullptr};
+void signalHandler(int signal){
+    window.get()->onResize();
 }
-void print_volumes(const std::vector<MixerDevice> &devices){
-	std::cout << "#devs: " << devices.size() << std::endl;
-	for(MixerDevice device : devices){
-		print_volume(device);
-	}
-}
+*/
 
 int main(){
+
+
 	try {
 		MixerManager mixerMgr("/dev/mixer");
 		MixerWindow window(mixerMgr);
+        //window = std::make_unique<MixerWindow>(MixerWindow(mixerMgr));
+        //signal(SIGWINCH, signalHandler);
 		window.show();
-	/*
-		std::vector<MixerDevice> &devices = mixerMgr.getMixers();
-
-	print_volumes(devices);
-	MixerDevice &pcm = devices.at(1);
-	pcm.decVolume(5);
-	mixerMgr.updateMixer(pcm);
-	print_volume(pcm);
-	pcm.incVolume(5);
-	mixerMgr.updateMixer(pcm);
-	print_volume(pcm);
-	*/
 	} catch(std::exception &e) {
 		std::cout << "err" << std::endl;
 	}

@@ -7,6 +7,7 @@
 #include "mixer_window.hpp"
 
 MixerWindow::MixerWindow(const MixerManager &mgr) : curPanelNr(0), mgr(mgr), curPanel(nullptr){
+	this->initMixers();
 }
 
 MixerWindow::~MixerWindow(){
@@ -16,6 +17,14 @@ MixerWindow::~MixerWindow(){
 void MixerWindow::show(){
 	this->init();
 	this->handleInput();	
+}
+
+void MixerWindow::resize(){
+    endwin();
+    clear();
+	box(stdscr, 0, 0);
+	refresh();
+	this->drawMixers();
 }
 
 void MixerWindow::init(){
@@ -30,7 +39,6 @@ void MixerWindow::init(){
 	attron(COLOR_PAIR(1));
 	//nodelay(stdscr, true);
 	box(stdscr, 0, 0);
-	this->initMixers();
 	wnoutrefresh(stdscr);
 	this->drawMixers();
 	this->selectMixer(1);
@@ -63,6 +71,9 @@ void MixerWindow::handleInput(){
 	while(!quit){
 		c = getch();
 		switch(c){
+            case KEY_RESIZE:
+                this->resize();
+            break;
 			case KEY_DOWN:
                 this->curPanel.get()->decreaseVolume();
                 this->mgr.updateMixer(this->curPanel.get()->getMixer());
