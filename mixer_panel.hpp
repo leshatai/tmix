@@ -14,8 +14,8 @@ protected:
     static const uint WIDTH_SCALE  = 4;
 
     static const uint HEIGHT_LABEL = 3;
-    static const uint HEIGHT_MAIN  = 30;
-    static const uint HEIGHT_SCALE = 25;
+    static const uint HEIGHT_MAIN  = 20;
+    static const uint HEIGHT_SCALE = 17;
 
     static const uint COLOR_PAIR_GREEN  = 20;
     static const uint COLOR_PAIR_RED    = 21;
