@@ -14,7 +14,7 @@ static const char *names[SOUND_MIXER_NRDEVICES] = SOUND_DEVICE_NAMES;
 MixerManager::MixerManager(std::string device) : device(device) {
 
 	uint volLeft = 0, volRight = 0;
-	int	devmask = 0, recmask = 0, recsrc = 0, orecsrc;
+	int	devmask = 0, recmask = 0, recsrc = 0;
 	int	bar;
 
 	if ((this->deviceHndl = open(device.c_str(), O_RDWR)) < 0){
@@ -37,7 +37,7 @@ MixerManager::MixerManager(std::string device) : device(device) {
 		//throw std::exception("Could not read recording device.");
 		//err(1, "SOUND_MIXER_READ_RECSRC");
 	}
-	orecsrc = recsrc;
+	//int orecsrc = recsrc;
 
 	for(uint i=0; i < SOUND_MIXER_NRDEVICES; i++){
 		if (!((1 << i) & devmask))
