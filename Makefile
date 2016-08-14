@@ -1,29 +1,30 @@
-CXX=c++
-RM=rm -f
-CPPFLAGS=-std=c++14 -Wall -g
-LDLIBS=-L/usr/local/lib -lncurses
-PRG_NAME=tmix
+#	@(#)Makefile	8.2 (Berkeley) 4/4/94
+# $FreeBSD: src/libexec/ftpd/Makefile,v 1.57 2006/06/05 15:50:34 yar Exp $
+# $DragonFly: src/libexec/ftpd/Makefile,v 1.3 2004/01/23 14:55:52 joerg Exp $
 
-tmix: mixer_device.o mixer_manager.o mixer_window.o mixer_panel.o main.o
-	$(CXX) -o $(PRG_NAME) mixer_device.o mixer_manager.o mixer_window.o mixer_panel.o main.o $(LDLIBS)
+PROG=	tmix
+MAN=	
+SRCS=\
+        mixer_manager.cxx \
+        mixer_window.cxx \
+        mixer_panel.cxx \
+    	mixer_device.cxx \
+        main.cxx
 
-mixer_panel.o:
-	$(CXX) $(CPPFLAGS) -c mixer_panel.cxx
+CC=c++
+CXXFLAGS=-std=c++14 -Wall
+CXXFLAGS+=-I${.CURDIR}
+YFLAGS=
+WARNS?=	2
+WFORMAT=0
 
-mixer_window.o:
-	$(CXX) $(CPPFLAGS) -c mixer_window.cxx
+DPADD=	${LIBNCURSES}
+LDADD=	-L/usr/local/lib -lncurses
 
-mixer_device.o:
-	$(CXX) $(CPPFLAGS) -c mixer_device.cxx
+#LSDIR=	../../bin/ls
+#.PATH:	${.CURDIR}/${LSDIR}
 
-mixer_manager.o:
-	$(CXX) $(CPPFLAGS) -c mixer_manager.cxx
+#all: $(SRCS)
 
-main.o:
-	$(CXX) $(CPPFLAGS) -c main.cxx
-
-clean:
-	$(RM) *.o
-
-dist-clean:
-	$(RM) *.o tmix
+#.include <bsd.subdir.mk>
+.include <bsd.prog.mk>
