@@ -6,7 +6,12 @@
 
 #include "mixer_window.hpp"
 
-MixerWindow::MixerWindow(const MixerManager &mgr) : curPanelNr(0), mgr(mgr), curPanel(nullptr){
+MixerWindow::MixerWindow(const MixerManager &mgr) :
+ width(80),
+ height(25), 
+ curPanelNr(0),
+ mgr(mgr),
+ curPanel(nullptr){
 	this->initMixers();
 }
 
@@ -19,12 +24,20 @@ void MixerWindow::show(){
 	this->handleInput();	
 }
 
+std::tuple<uint, uint> MixerWindow::getSize(){
+    return std::make_tuple(this->height, this->width); 
+}
+
 void MixerWindow::resize(){
     endwin();
     clear();
+    getmaxyx(stdscr, this->height, this->width);
 	box(stdscr, 0, 0);
 	refresh();
-	this->drawMixers();
+
+    for(auto &panel : this->mixerPanels){
+        panel.resize();
+    }
 }
 
 void MixerWindow::init(){
@@ -39,6 +52,8 @@ void MixerWindow::init(){
 	attron(COLOR_PAIR(1));
 	//nodelay(stdscr, true);
 	box(stdscr, 0, 0);
+    getmaxyx(stdscr, this->height, this->width);
+
 	wnoutrefresh(stdscr);
 	this->drawMixers();
 	this->selectMixer(1);
@@ -51,7 +66,7 @@ void MixerWindow::close(){
 void MixerWindow::initMixers(){
 	uint panelNr = 1;
 	for(MixerDevice &dev : this->mgr.getMixers()){
-		MixerPanel panel(panelNr, dev);
+		MixerPanel panel(panelNr, dev, *this);
 		this->mixerPanels.push_back(panel);
 		panelNr++;
 	}

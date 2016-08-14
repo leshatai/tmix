@@ -2,6 +2,7 @@
 #define __MIXER_PANEL_H__
 
 #include "mixer_device.hpp"
+#include "mixer_window_interface.hpp"
 
 #include <ncurses.h>
 #include <memory>
@@ -23,12 +24,22 @@ protected:
     static const uint SCALE_LEFT  = 1;
     static const uint SCALE_RIGHT = 2;
 
+    uint heightMain;
+    uint heightLabel;
+    uint heightScale;
+
 	uint nr;
 	MixerDevice &device;
 	std::shared_ptr<WINDOW> mainWindow;
 	std::shared_ptr<WINDOW> labelWindow;
 	std::shared_ptr<WINDOW> scaleWindow;
+    MixerWindowInterface &window;
 
+    /**
+     * Calculates the size of all windows, depending
+     * on the size of the main window
+     */
+    void calculateSizes();
     bool isInitialized();
     void initPanel();
     void drawLabel();
@@ -36,12 +47,13 @@ protected:
     void drawSingleScale(uint numLines, uint height, uint leftRight);
     void clearScale(uint numLines); 
 public:
-	MixerPanel(uint nr, MixerDevice &device);
+	MixerPanel(uint nr, MixerDevice &device, MixerWindowInterface &window);
 	~MixerPanel();
     MixerDevice& getMixer();
 	void refresh();
 	void highlight();
 	void draw();
+	void resize();
 
     void decreaseVolume();
     void increaseVolume();

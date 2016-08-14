@@ -4,12 +4,16 @@
 #include <iostream>
 #include <sstream>
 
-MixerPanel::MixerPanel(uint nr, MixerDevice &device) :
+MixerPanel::MixerPanel(uint nr, MixerDevice &device, MixerWindowInterface &window) :
+ heightMain(20),
+ heightLabel(3),
+ heightScale(17),
  nr(nr),
  device(device),
  mainWindow(nullptr),
  labelWindow(nullptr),
- scaleWindow(nullptr) {
+ scaleWindow(nullptr),
+ window(window){
 }
 
 MixerPanel::~MixerPanel(){
@@ -49,6 +53,19 @@ void MixerPanel::refresh(){
 	//wrefresh(this->mainWindow.get());
 }
 
+void MixerPanel::resize(){
+    if(!this->isInitialized()){
+        this->initPanel();
+    } else {
+        this->calculateSizes(); 
+        wresize(this->mainWindow.get(), this->heightMain, WIDTH_MAIN);
+        wresize(this->scaleWindow.get(), this->heightScale, WIDTH_SCALE);
+        mvwin(this->labelWindow.get(), this->heightScale+5, this->nr*10);
+    }
+
+    this->draw();
+}
+
 void MixerPanel::highlight(){
 	if (!this->mainWindow){
 		return;
@@ -61,6 +78,7 @@ void MixerPanel::highlight(){
 
 void MixerPanel::draw(){
     if(!this->isInitialized()){
+        this->calculateSizes();
         this->initPanel();
     }
 
@@ -82,17 +100,17 @@ void MixerPanel::initPanel(){
     uint beginX = this->nr*10;
 
 	if (!this->mainWindow){
-		std::shared_ptr<WINDOW> wnd(newwin(HEIGHT_MAIN, WIDTH_MAIN, 10, beginX));
+		std::shared_ptr<WINDOW> wnd(newwin(this->heightMain, WIDTH_MAIN, 4, beginX));
 		this->mainWindow = wnd;
 	}
-	if (!this->labelWindow){
-		std::shared_ptr<WINDOW> wnd(newwin(HEIGHT_LABEL, WIDTH_LABEL, 36, beginX+1));
-		this->labelWindow = wnd;
-	}
     if (!this->scaleWindow){
-        std::shared_ptr<WINDOW> wnd(newwin(HEIGHT_SCALE, WIDTH_SCALE, 11, beginX+3));
+        std::shared_ptr<WINDOW> wnd(newwin(this->heightScale, WIDTH_SCALE, 5, beginX+3));
         this->scaleWindow = wnd;
     }
+	if (!this->labelWindow){
+		std::shared_ptr<WINDOW> wnd(newwin(this->heightLabel, WIDTH_LABEL, this->heightScale+5, beginX+1));
+		this->labelWindow = wnd;
+	}
 } 
 
 bool MixerPanel::isInitialized(){
@@ -128,7 +146,7 @@ void MixerPanel::drawScale(){
 	box(this->scaleWindow.get(), 0, 0);
     // as we draw a border, the first and the last line are already
     // occupied with the border symbols
-    uint numLines    = HEIGHT_SCALE-2;
+    uint numLines    = this->heightScale-2;
     uint heightLeft  = this->device.getVolumeLeft()*(numLines/100.0);
     uint heightRight = this->device.getVolumeRight()*(numLines/100.0);
 
@@ -155,4 +173,18 @@ void MixerPanel::drawLabel(){
 	mvwprintw(this->labelWindow.get(), 1, 0, txt.str().c_str());
 
 	wrefresh(this->labelWindow.get());
+}
+
+void MixerPanel::calculateSizes(){
+    std::tuple<uint, uint> size = this->window.getSize();
+    uint height = std::get<0>(size);
+    //uint width  = std::get<1>(size);
+
+    if (height < 25){
+        return;
+    }
+
+    this->heightMain  = height - 8; 
+    this->heightLabel = 3;
+    this->heightScale = this->heightMain - this->heightLabel - 3;
 }

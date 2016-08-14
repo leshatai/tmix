@@ -18,6 +18,10 @@ YFLAGS=
 WARNS?=	2
 WFORMAT=0
 
+.ifdef DEBUG
+CXXFLAGS += -g
+.endif
+
 DPADD=	${LIBNCURSES}
 LDADD=	-L/usr/local/lib -lncurses
 
