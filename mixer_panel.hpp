@@ -9,17 +9,17 @@
 
 class MixerPanel{
 protected:
-    static const uint WIDTH_LABEL  = 8;
-    static const uint WIDTH_MAIN   = 10;
+    static const uint WIDTH_LABEL  = 7;
     static const uint WIDTH_SCALE  = 4;
 
     static const uint HEIGHT_LABEL = 3;
     static const uint HEIGHT_MAIN  = 20;
     static const uint HEIGHT_SCALE = 17;
 
-    static const uint COLOR_PAIR_GREEN  = 20;
-    static const uint COLOR_PAIR_RED    = 21;
-    static const uint COLOR_PAIR_WHITE  = 22;
+    static const uint COLOR_PAIR_GREEN       = 20;
+    static const uint COLOR_PAIR_RED         = 21;
+    static const uint COLOR_PAIR_WHITE       = 22;
+    static const uint COLOR_PAIR_HIGHLIGHT   = 23;
 
     static const uint SCALE_LEFT  = 1;
     static const uint SCALE_RIGHT = 2;
@@ -28,11 +28,16 @@ protected:
     uint heightLabel;
     uint heightScale;
 
-	uint nr;
+    uint pos;
 	MixerDevice &device;
+	WINDOW *mainWindow;
+	WINDOW *labelWindow;
+	WINDOW *scaleWindow;
+/*
 	std::shared_ptr<WINDOW> mainWindow;
 	std::shared_ptr<WINDOW> labelWindow;
 	std::shared_ptr<WINDOW> scaleWindow;
+*/  
     MixerWindowInterface &window;
 
     /**
@@ -47,13 +52,16 @@ protected:
     void drawSingleScale(uint numLines, uint height, uint leftRight);
     void clearScale(uint numLines); 
 public:
-	MixerPanel(uint nr, MixerDevice &device, MixerWindowInterface &window);
+    static const uint WIDTH_MAIN   = 10;
+
+	MixerPanel(uint pos, MixerDevice &device, MixerWindowInterface &window);
 	~MixerPanel();
     MixerDevice& getMixer();
 	void refresh();
 	void highlight();
 	void draw();
 	void resize();
+    void updatePosition(uint pos);
 
     void decreaseVolume();
     void increaseVolume();
