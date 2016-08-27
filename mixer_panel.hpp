@@ -50,14 +50,13 @@ protected:
     void drawLabel();
     void drawScale();
     void drawSingleScale(uint numLines, uint height, uint leftRight);
-    void clearScale(uint numLines); 
+
 public:
     static const uint WIDTH_MAIN   = 10;
 
 	MixerPanel(uint pos, MixerDevice &device, MixerWindowInterface &window);
 	~MixerPanel();
     MixerDevice& getMixer();
-	void refresh();
 	void highlight();
 	void draw();
 	void resize();

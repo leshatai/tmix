@@ -6,7 +6,6 @@
 
 class MixerWindowInterface {
 public:
-    virtual std::tuple<uint, uint> getSize() = 0;
     virtual WINDOW* getViewport() = 0;
 };
 

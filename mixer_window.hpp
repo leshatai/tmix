@@ -15,6 +15,8 @@ protected:
     static const int DIR_RIGHT = 1;
     static const int VOL_UP    = 1;
     static const int VOL_DOWN  = 2;
+    static const std::string IND_LEFT;
+    static const std::string IND_RIGHT;
 
     uint width;
     uint height;
@@ -28,22 +30,87 @@ protected:
     uint maxPanelPos;
     WINDOW *viewport;
 
+    /**
+     * Initializes ncurses window and mixer panels
+     */
 	void init();
-	void close();
+    
+    /**
+     * Initializes all mixer devices
+     */
 	void initMixers();
+
+    /**
+     * Draws all mixers to viewport
+     */
 	void drawMixers();
+
+    /**
+     * Resizes window/viewport 
+     */
     void resize();
-	void handleInput();
-	bool selectMixer(int nr);
+
+
+    /**
+     * Selects mixer with given number
+     */
+	void selectMixer(int pos);
+
+    /**
+     * Draws the scroll indicators
+     */
     void drawScroller(int dir);
+
+    /**
+     * Scrolls viewport left/right to show current selected mixer
+     */
     void scrollPanels(int dir);
+
+    /**
+     * In-/Decreases volume according to given direction
+     *
+     * @param dir Direction indicator
+     */
     void adjustVolume(uint dir);
+
+    /**
+     * Returns the number of panels that would fit in current window
+     */
     uint getNumVisiblePanels();
 
+    /**
+     * Refreshes the viewport to current window size
+     */
+    void updateViewport();
+
+    /**
+     * Shows/hides scroll left/right indicators 
+     */
+    void updateScrollers();
+
 public:
+    /**
+     * Listens to user input (arrow keys) and calls the appropriate method
+     */
+	void handleInput();
+    /**
+     * Std. constructor
+     */
 	MixerWindow(const MixerManager &mgr);
+
+    /**
+     * Std. destructor
+     */
 	~MixerWindow();
+
+    /**
+     * Shows the mixer window
+     */
 	void show();
+
+    /**
+     * Returns current viewport size
+     */
     std::tuple<uint, uint> getSize();
     WINDOW* getViewport();
 };

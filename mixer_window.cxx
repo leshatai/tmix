@@ -6,6 +6,9 @@
 
 #include "mixer_window.hpp"
 
+const std::string MixerWindow::IND_LEFT  = "<";
+const std::string MixerWindow::IND_RIGHT = ">";
+
 MixerWindow::MixerWindow(const MixerManager &mgr) :
  width(80),
  height(25), 
@@ -19,17 +22,15 @@ MixerWindow::MixerWindow(const MixerManager &mgr) :
 }
 
 MixerWindow::~MixerWindow(){
-	this->close();
+    endwin();
     this->viewport = nullptr;
 }
 
 void MixerWindow::show(){
 	this->init();
+	this->drawMixers();
+	this->selectMixer(0);
 	this->handleInput();	
-}
-
-std::tuple<uint, uint> MixerWindow::getSize(){
-    return std::make_tuple(this->height, this->width); 
 }
 
 WINDOW* MixerWindow::getViewport(){
@@ -37,45 +38,39 @@ WINDOW* MixerWindow::getViewport(){
 }
 
 void MixerWindow::resize(){
-    endwin();
-    clear();
+    uint oldHeight = this->height;
     getmaxyx(stdscr, this->height, this->width);
-	box(stdscr, 0, 0);
-	refresh();
 
     uint numPanels    = this->mixerPanels.size();
     uint numVisPanels = this->getNumVisiblePanels();
-    uint viewportCol  = this->curPanelPos*MixerPanel::WIDTH_MAIN;
-    uint viewRows     = this->height-2;
-    uint viewCols     = this->width-6;
     
     this->maxPanelPos = numVisPanels-1;
+    this->height      = this->height >= 10 ? this->height : 10;
+
+    // do we have to resize the panels ?
+    if (this->height != oldHeight){
+        wresize(this->viewport, this->height-2, numPanels*MixerPanel::WIDTH_MAIN);
+        for(auto &panel : this->mixerPanels){
+            panel.resize();
+        }
+    }
+
     // can we display all panels on one screen ?
     if (numPanels <= numVisPanels){
         this->maxPanelPos = numPanels-1;
         this->minPanelPos = 0;
-        viewportCol       = 0;
-        viewCols          = numPanels*MixerPanel::WIDTH_MAIN;
-    }
-
-    // are we still on first screen ?
-    if (this->curPanelPos < this->maxPanelPos){
-        viewportCol = 0;
     }
 
     // do we have to scroll to current position ?
     if (this->curPanelPos >= this->maxPanelPos && numPanels > numVisPanels){
         this->minPanelPos  = this->curPanelPos - (numVisPanels - 1);
         this->maxPanelPos  = this->curPanelPos;
-        viewportCol        = this->minPanelPos*MixerPanel::WIDTH_MAIN;
     }
 
-    prefresh(this->viewport, 0, viewportCol, 4, 1, viewRows, viewCols);
-/*
-    for(auto &panel : this->mixerPanels){
-        panel.resize();
-    }
-*/
+    clear();
+	box(stdscr, 0, 0);
+    refresh();
+    this->updateViewport();
 }
 
 void MixerWindow::init(){
@@ -88,34 +83,20 @@ void MixerWindow::init(){
 	cbreak();
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	attron(COLOR_PAIR(1));
-	//nodelay(stdscr, true);
-	box(stdscr, 0, 0);
-	wnoutrefresh(stdscr);
+	//nodelay(stdscr, true); // this causes 100% cpu usage
 
     getmaxyx(stdscr, this->height, this->width);
     this->maxPanelPos = this->getNumVisiblePanels()-1;
     uint viewportRows = this->height - 2;
     uint viewportCols = this->mgr.getMixers().size()*MixerPanel::WIDTH_MAIN;
     this->viewport    = newpad(viewportRows, viewportCols);
-	this->drawMixers();
-	this->selectMixer(0);
 
-    if (this->maxPanelPos < this->mixerPanels.size()-1){
-        this->drawScroller(DIR_RIGHT);
-    }
-
-    //uint viewCols = (this->maxPanelPos*MixerPanel::WIDTH_MAIN)-2;
-    //prefresh(this->viewport, 0, 0, 1, 1, viewportRows, viewCols);
-    //refresh();
-}
-
-void MixerWindow::close(){
-	endwin();
+	box(stdscr, 0, 0);
+    refresh();
 }
 
 void MixerWindow::initMixers(){
 	uint panelNr   = 0;
-    uint numPanels = this->mgr.getMixers().size();
 
 	for(MixerDevice &dev : this->mgr.getMixers()){
 		MixerPanel panel(panelNr, dev, *this);
@@ -132,10 +113,9 @@ void MixerWindow::drawMixers(){
 }
 
 void MixerWindow::handleInput(){
-	std::ostringstream txt;
-	std::stringstream stringNr;
 	int c;
 	bool quit = false;
+
 	while(!quit){
 		c = getch();
 		switch(c){
@@ -163,51 +143,36 @@ void MixerWindow::handleInput(){
 	}
 }
 
-bool MixerWindow::selectMixer(int nr){
-    if (nr < 0 || nr > this->mixerPanels.size()-1){
-        return false;
+void MixerWindow::selectMixer(int pos){
+    if (pos < 0 || pos > this->mixerPanels.size()-1){
+        return;
     }
 
     // scroll left
-    if (nr < this->minPanelPos){
+    if (pos < this->minPanelPos){
         this->scrollPanels(DIR_LEFT);
     }
 
     // scroll right
-    if (nr > this->maxPanelPos){
+    if (pos > this->maxPanelPos){
         this->scrollPanels(DIR_RIGHT);
-    }
-
-    if (this->minPanelPos > 0){
-        this->drawScroller(DIR_LEFT);
-    }
-
-    if (this->maxPanelPos < this->mixerPanels.size()-1){
-        this->drawScroller(DIR_RIGHT);
     }
 
     if(this->curPanel){
         this->curPanel.get()->draw();
     }
 
-    this->curPanelPos = nr;
-    this->curPanel    = std::make_shared<MixerPanel>(this->mixerPanels.at(nr));
-    this->curPanel.get()->highlight();
+    this->curPanelPos = pos;
+    this->curPanel    = std::make_shared<MixerPanel>(this->mixerPanels.at(pos));
 
-    uint viewportRows = this->height-2;
-    uint viewportCol  = this->minPanelPos*MixerPanel::WIDTH_MAIN;
-    uint viewCols     = this->width-6;
-
-    prefresh(this->viewport, 0, viewportCol, 4, 1, viewportRows, viewCols);
-    refresh();
-
-    return true;
+    this->updateViewport();
+    //this->updateScrollers();
 }
 
 void MixerWindow::drawScroller(int dir){
     uint rows = 9;
     uint col  = dir == DIR_LEFT ? 1 : this->width - 2; 
-    std::string dirSymbol = dir == DIR_LEFT ? "<" : ">";
+    std::string dirSymbol = dir == DIR_LEFT ? IND_LEFT : IND_RIGHT;
     
 
     for (uint i=0; i < rows; i++){
@@ -242,13 +207,36 @@ void MixerWindow::adjustVolume(uint dir){
     }
     
     this->mgr.updateMixer(panel->getMixer());
-    panel->highlight();
-    panel->draw();
+    this->updateViewport();
+}
 
+void MixerWindow::updateViewport(){
+    uint viewportCols = this->mixerPanels.size()*MixerPanel::WIDTH_MAIN;
     uint viewportRows = this->height-2;
     uint viewportCol  = this->minPanelPos*MixerPanel::WIDTH_MAIN;
     uint viewCols     = this->width-6;
 
-    pnoutrefresh(this->viewport, 0, viewportCol, 4, 1, viewportRows, viewCols);
-    doupdate();
+    if (this->curPanelPos < this->maxPanelPos){
+        viewportCol = 0;
+    }
+
+    if (viewCols > viewportCols){
+        viewCols = viewportCols;
+    }
+
+    if (this->curPanel){
+        this->curPanel.get()->highlight();
+    }
+
+    prefresh(this->viewport, 0, viewportCol, 1, 1, viewportRows, viewCols);
+}
+
+void MixerWindow::updateScrollers(){
+    if (this->minPanelPos > 0){
+        this->drawScroller(DIR_LEFT);
+    }
+
+    if (this->maxPanelPos < this->mixerPanels.size()-1){
+        this->drawScroller(DIR_RIGHT);
+    }
 }
