@@ -165,7 +165,12 @@ void MixerPanel::drawLabel(){
     std::ostringstream txt;
 
     // add current vol
-    txt << this->device.getVolumeLeft() << ":" << this->device.getVolumeRight() << std::endl;
+    if (this->device.isMuted()){
+        txt << "M:M" << std::endl;
+    } else {
+        txt << this->device.getVolumeLeft() << ":" << this->device.getVolumeRight() << std::endl;
+    }
+
     // print number
     mvwprintw(label, 0, 0, txt.str().c_str());
     txt.str("");

@@ -49,7 +49,7 @@ void MixerWindow::resize(){
 
     // do we have to resize the panels ?
     if (this->height != oldHeight){
-        wresize(this->viewport, this->height-2, numPanels*MixerPanel::WIDTH_MAIN);
+        wresize(this->viewport, this->height - PAD_HEIGHT_VIEWPORT, numPanels*MixerPanel::WIDTH_MAIN);
         for(auto &panel : this->mixerPanels){
             panel.resize();
         }
@@ -87,7 +87,7 @@ void MixerWindow::init(){
 
     getmaxyx(stdscr, this->height, this->width);
     this->maxPanelPos = this->getNumVisiblePanels()-1;
-    uint viewportRows = this->height - 2;
+    uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
     uint viewportCols = this->mgr.getMixers().size()*MixerPanel::WIDTH_MAIN;
     this->viewport    = newpad(viewportRows, viewportCols);
 
@@ -215,9 +215,9 @@ void MixerWindow::adjustVolume(uint dir){
 
 void MixerWindow::updateViewport(){
     uint viewportCols = this->mixerPanels.size()*MixerPanel::WIDTH_MAIN;
-    uint viewportRows = this->height-2;
+    uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
     uint viewportCol  = this->minPanelPos*MixerPanel::WIDTH_MAIN;
-    uint viewCols     = this->width-6;
+    uint viewCols     = this->width - PAD_WIDTH_VIEWPORT;
 
     if (this->curPanelPos < this->maxPanelPos){
         viewportCol = 0;
@@ -231,6 +231,7 @@ void MixerWindow::updateViewport(){
         this->curPanel.get()->highlight();
     }
 
+    mvprintw(1, 2, "Keys: 'q': Quit | 'm': Mute");
     prefresh(this->viewport, 0, viewportCol, 1, 1, viewportRows, viewCols);
 }
 

@@ -15,6 +15,10 @@ class MixerWindow : MixerWindowInterface {
         static const int DIR_RIGHT = 1;
         static const int VOL_UP    = 1;
         static const int VOL_DOWN  = 2;
+
+        static const int PAD_HEIGHT_VIEWPORT = 3;
+        static const int PAD_WIDTH_VIEWPORT = 6;
+
         static const std::string IND_LEFT;
         static const std::string IND_RIGHT;
 
