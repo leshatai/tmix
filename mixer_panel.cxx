@@ -5,25 +5,35 @@
 #include <sstream>
 
 MixerPanel::MixerPanel(uint pos, MixerDevice &device, MixerWindowInterface &window) :
- heightMain(20),
- heightLabel(3),
- heightScale(17),
- pos(pos),
- device(device),
- window(window){
-	this->mainWindow  = nullptr;
-    this->labelWindow = nullptr;
-	this->scaleWindow = nullptr;
-}
+    heightMain(20),
+    heightLabel(3),
+    heightScale(17),
+    pos(pos),
+    device(device),
+    window(window){
+        this->mainWindow  = nullptr;
+        this->labelWindow = nullptr;
+        this->scaleWindow = nullptr;
+    }
 
 MixerPanel::~MixerPanel(){
-	delwin(this->mainWindow);
+    delwin(this->mainWindow);
     delwin(this->labelWindow);
-	delwin(this->scaleWindow);
+    delwin(this->scaleWindow);
 
-	this->mainWindow  = nullptr;
+    this->mainWindow  = nullptr;
     this->labelWindow = nullptr;
-	this->scaleWindow = nullptr;
+    this->scaleWindow = nullptr;
+}
+
+void MixerPanel::mute(){
+    if (this->device.isMuted()){
+        this->device.unmute();
+    } else {
+        this->device.mute();
+    }
+
+    this->draw();
 }
 
 MixerDevice& MixerPanel::getMixer(){
@@ -59,15 +69,15 @@ void MixerPanel::resize(){
 }
 
 void MixerPanel::highlight(){
-	if (!this->mainWindow){
-		return;
-	}
+    if (!this->mainWindow){
+        return;
+    }
 
     WINDOW *label = this->labelWindow;
 
-	wattron(label, COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
-	this->drawLabel();
-	wattroff(label, COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
+    wattron(label, COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
+    this->drawLabel();
+    wattroff(label, COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
 }
 
 void MixerPanel::draw(){
@@ -80,7 +90,7 @@ void MixerPanel::draw(){
     wclear(this->labelWindow);
 
     //box(this->mainWindow, 0, 0);
-	//wrefresh(this->mainWindow);
+    //wrefresh(this->mainWindow);
 
     this->drawLabel();
     this->drawScale();
@@ -93,23 +103,23 @@ void MixerPanel::initPanel(){
 
     this->calculateSizes();
 
-	init_pair(COLOR_PAIR_HIGHLIGHT, COLOR_WHITE, COLOR_BLUE);
-	init_pair(COLOR_PAIR_GREEN, COLOR_GREEN, COLOR_BLACK);
-	init_pair(COLOR_PAIR_RED, COLOR_RED, COLOR_BLACK);
-	init_pair(COLOR_PAIR_WHITE, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COLOR_PAIR_HIGHLIGHT, COLOR_WHITE, COLOR_BLUE);
+    init_pair(COLOR_PAIR_GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_PAIR_RED, COLOR_RED, COLOR_BLACK);
+    init_pair(COLOR_PAIR_WHITE, COLOR_WHITE, COLOR_BLACK);
 
     uint beginX = this->pos*WIDTH_MAIN;
 
     WINDOW *viewport = this->window.getViewport();
-	if (!this->mainWindow){
-		this->mainWindow = derwin(viewport, this->heightMain, WIDTH_MAIN, 0, beginX);
-	}
+    if (!this->mainWindow){
+        this->mainWindow = derwin(viewport, this->heightMain, WIDTH_MAIN, 0, beginX);
+    }
     if (!this->scaleWindow){
         this->scaleWindow = derwin(this->mainWindow, this->heightScale, WIDTH_SCALE, 1, 3);
     }
-	if (!this->labelWindow){
+    if (!this->labelWindow){
         this->labelWindow = derwin(this->mainWindow, this->heightLabel, WIDTH_LABEL, this->heightScale+1, 2);
-	}
+    }
 } 
 
 bool MixerPanel::isInitialized(){
@@ -131,15 +141,15 @@ void MixerPanel::drawSingleScale(uint numLines, uint height, uint leftRight){
             cp = COLOR_PAIR_RED;
         }
         wattron(scaleWindow, COLOR_PAIR(cp));
-	    mvwprintw(scaleWindow, numLines-i, leftRight, "%c", 177);
+        mvwprintw(scaleWindow, numLines-i, leftRight, "%c", 177);
         wattroff(scaleWindow, COLOR_PAIR(cp));
     }
 }
 
 void MixerPanel::drawScale(){
     WINDOW *scale = this->scaleWindow;
-    
-	box(scale, 0, 0);
+
+    box(scale, 0, 0);
     // as we draw a border, the first and the last line are already
     // occupied with the border symbols
     uint numLines    = this->heightScale-2;
@@ -152,19 +162,19 @@ void MixerPanel::drawScale(){
 
 void MixerPanel::drawLabel(){
     WINDOW *label = this->labelWindow;
-	std::ostringstream txt;
+    std::ostringstream txt;
 
-	// add current vol
-	txt << this->device.getVolumeLeft() << ":" << this->device.getVolumeRight() << std::endl;
-	// print number
-	mvwprintw(label, 0, 0, txt.str().c_str());
-	txt.str("");
-	txt.clear();
-	// fill with spaces until position 15
-	//txt << std::setw(8-this->device.getName().length()) << std::setfill(' ') << std::right;
-	// print mixer name
-	txt << this->device.getName() << std::endl;
-	mvwprintw(label, 1, 0, txt.str().c_str());
+    // add current vol
+    txt << this->device.getVolumeLeft() << ":" << this->device.getVolumeRight() << std::endl;
+    // print number
+    mvwprintw(label, 0, 0, txt.str().c_str());
+    txt.str("");
+    txt.clear();
+    // fill with spaces until position 15
+    //txt << std::setw(8-this->device.getName().length()) << std::setfill(' ') << std::right;
+    // print mixer name
+    txt << this->device.getName() << std::endl;
+    mvwprintw(label, 1, 0, txt.str().c_str());
 }
 
 void MixerPanel::calculateSizes(){

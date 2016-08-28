@@ -10,109 +10,113 @@
 #include <ncurses.h>
 
 class MixerWindow : MixerWindowInterface {
-protected:
-    static const int DIR_LEFT  = -1;
-    static const int DIR_RIGHT = 1;
-    static const int VOL_UP    = 1;
-    static const int VOL_DOWN  = 2;
-    static const std::string IND_LEFT;
-    static const std::string IND_RIGHT;
+    protected:
+        static const int DIR_LEFT  = -1;
+        static const int DIR_RIGHT = 1;
+        static const int VOL_UP    = 1;
+        static const int VOL_DOWN  = 2;
+        static const std::string IND_LEFT;
+        static const std::string IND_RIGHT;
 
-    uint width;
-    uint height;
-	uint curPanelPos;
-	MixerManager mgr;
-	std::shared_ptr<MixerPanel> curPanel;
-	std::vector<MixerPanel> mixerPanels;
-    /** lower boundary in view port */
-    uint minPanelPos;
-    /** upper boundary in view port */
-    uint maxPanelPos;
-    WINDOW *viewport;
+        uint width;
+        uint height;
+        uint curPanelPos;
+        MixerManager mgr;
+        std::shared_ptr<MixerPanel> curPanel;
+        std::vector<MixerPanel> mixerPanels;
+        /** lower boundary in view port */
+        uint minPanelPos;
+        /** upper boundary in view port */
+        uint maxPanelPos;
+        WINDOW *viewport;
 
-    /**
-     * Initializes ncurses window and mixer panels
-     */
-	void init();
-    
-    /**
-     * Initializes all mixer devices
-     */
-	void initMixers();
+        /**
+         * Initializes ncurses window and mixer panels
+         */
+        void init();
 
-    /**
-     * Draws all mixers to viewport
-     */
-	void drawMixers();
+        /**
+         * Initializes all mixer devices
+         */
+        void initMixers();
 
-    /**
-     * Resizes window/viewport 
-     */
-    void resize();
+        /**
+         * Draws all mixers to viewport
+         */
+        void drawMixers();
 
+        /**
+         * Resizes window/viewport 
+         */
+        void resize();
 
-    /**
-     * Selects mixer with given number
-     */
-	void selectMixer(int pos);
+        /**
+         * Selects mixer with given number
+         */
+        void selectMixer(int pos);
 
-    /**
-     * Draws the scroll indicators
-     */
-    void drawScroller(int dir);
+        /**
+         * Mutes/Unmutes current mixer
+         */
+        void muteMixer();
 
-    /**
-     * Scrolls viewport left/right to show current selected mixer
-     */
-    void scrollPanels(int dir);
+        /**
+         * Draws the scroll indicators
+         */
+        void drawScroller(int dir);
 
-    /**
-     * In-/Decreases volume according to given direction
-     *
-     * @param dir Direction indicator
-     */
-    void adjustVolume(uint dir);
+        /**
+         * Scrolls viewport left/right to show current selected mixer
+         */
+        void scrollPanels(int dir);
 
-    /**
-     * Returns the number of panels that would fit in current window
-     */
-    uint getNumVisiblePanels();
+        /**
+         * In-/Decreases volume according to given direction
+         *
+         * @param dir Direction indicator
+         */
+        void adjustVolume(uint dir);
 
-    /**
-     * Refreshes the viewport to current window size
-     */
-    void updateViewport();
+        /**
+         * Returns the number of panels that would fit in current window
+         */
+        uint getNumVisiblePanels();
 
-    /**
-     * Shows/hides scroll left/right indicators 
-     */
-    void updateScrollers();
+        /**
+         * Refreshes the viewport to current window size
+         */
+        void updateViewport();
 
-public:
-    /**
-     * Listens to user input (arrow keys) and calls the appropriate method
-     */
-	void handleInput();
-    /**
-     * Std. constructor
-     */
-	MixerWindow(const MixerManager &mgr);
+        /**
+         * Shows/hides scroll left/right indicators 
+         */
+        void updateScrollers();
 
-    /**
-     * Std. destructor
-     */
-	~MixerWindow();
+    public:
+        /**
+         * Listens to user input (arrow keys) and calls the appropriate method
+         */
+        void handleInput();
+        /**
+         * Std. constructor
+         */
+        MixerWindow(const MixerManager &mgr);
 
-    /**
-     * Shows the mixer window
-     */
-	void show();
+        /**
+         * Std. destructor
+         */
+        ~MixerWindow();
 
-    /**
-     * Returns current viewport size
-     */
-    std::tuple<uint, uint> getSize();
-    WINDOW* getViewport();
+        /**
+         * Shows the mixer window
+         */
+        void show();
+
+        /**
+         * Returns current viewport size
+         */
+        std::tuple<uint, uint> getSize();
+        WINDOW* getViewport();
 };
 
 #endif

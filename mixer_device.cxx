@@ -1,7 +1,14 @@
 
 #include "mixer_device.hpp"
 
-MixerDevice::MixerDevice(uint mixerNr, std::string name, uint volLeft, uint volRight) : nr(mixerNr), name(name),  volLeft(volLeft), volRight(volRight) {
+MixerDevice::MixerDevice(uint mixerNr, std::string name, uint volLeft, uint volRight) : 
+ nr(mixerNr),
+ name(name),
+ volLeft(volLeft),
+ volRight(volRight),
+ muted(false),
+ muteVolLeft(volLeft),
+ muteVolRight(volRight) {
 }
 
 
@@ -42,4 +49,29 @@ void MixerDevice::decVolume(uint left, uint right){
 	volRight = volRight < 0 ? 0 : volRight;
 
 	this->setVolume(volLeft, volRight);
+}
+
+bool MixerDevice::isMuted(){
+    return this->muted;
+}
+
+void MixerDevice::mute(){
+    if (this->muted){
+        return;
+    }
+
+    this->muteVolLeft  = this->volLeft;
+    this->muteVolRight = this->volRight;
+    this->muted      = true;
+
+    this->setVolume(0);
+}
+
+void MixerDevice::unmute(){
+    if (!this->muted){
+        return;
+    }
+
+    this->setVolume(muteVolLeft, muteVolRight);
+    this->muted = false;
 }
