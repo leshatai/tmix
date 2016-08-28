@@ -50,10 +50,6 @@ void MixerPanel::decreaseVolume(){
     this->draw();
 }
 
-void MixerPanel::updatePosition(uint pos){
-    this->pos = pos; 
-}
-
 void MixerPanel::resize(){
     if(!this->isInitialized()){
         this->initPanel();

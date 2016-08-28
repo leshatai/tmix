@@ -55,7 +55,6 @@ class MixerPanel{
         void highlight();
         void draw();
         void resize();
-        void updatePosition(uint pos);
 
         void decreaseVolume();
         void increaseVolume();
