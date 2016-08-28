@@ -50,6 +50,16 @@ class MixerWindow : MixerWindowInterface {
         void drawMixers();
 
         /**
+         * Returns the page of the currently selected panel
+         */
+        uint getCurrentPage();
+
+        /**
+         * Returns the number of panel pages
+         */
+        uint getNumPages();
+
+        /**
          * Resizes window/viewport 
          */
         void resize();

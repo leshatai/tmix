@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 #include "mixer_window.hpp"
 
@@ -169,14 +170,12 @@ void MixerWindow::selectMixer(int pos){
     this->curPanel    = std::make_shared<MixerPanel>(this->mixerPanels.at(pos));
 
     this->updateViewport();
-    //this->updateScrollers();
 }
 
 void MixerWindow::drawScroller(int dir){
     uint rows = 9;
     uint col  = dir == DIR_LEFT ? 1 : this->width - 2; 
     std::string dirSymbol = dir == DIR_LEFT ? IND_LEFT : IND_RIGHT;
-
 
     for (uint i=0; i < rows; i++){
         mvprintw(6+i, col, dirSymbol.c_str());
@@ -187,7 +186,7 @@ void MixerWindow::scrollPanels(int dir){
     uint numPanels    = this->mixerPanels.size()-1;
 
     if ((this->minPanelPos == 0 && dir == DIR_LEFT) ||
-            (this->maxPanelPos == numPanels && dir == DIR_RIGHT)){
+        (this->maxPanelPos == numPanels && dir == DIR_RIGHT)){
         return;
     }    
 
@@ -196,7 +195,7 @@ void MixerWindow::scrollPanels(int dir){
 }
 
 uint MixerWindow::getNumVisiblePanels(){
-    return this->width  / MixerPanel::WIDTH_MAIN;
+    return (this->width - PAD_WIDTH_VIEWPORT)  / MixerPanel::WIDTH_MAIN;
 }
 
 void MixerWindow::adjustVolume(uint dir){
@@ -217,7 +216,7 @@ void MixerWindow::updateViewport(){
     uint viewportCols = this->mixerPanels.size()*MixerPanel::WIDTH_MAIN;
     uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
     uint viewportCol  = this->minPanelPos*MixerPanel::WIDTH_MAIN;
-    uint viewCols     = this->width - PAD_WIDTH_VIEWPORT;
+    uint viewCols     = this->getNumVisiblePanels() * MixerPanel::WIDTH_MAIN;
 
     if (this->curPanelPos < this->maxPanelPos){
         viewportCol = 0;
@@ -233,14 +232,18 @@ void MixerWindow::updateViewport(){
 
     mvprintw(1, 2, "Keys: 'q': Quit | 'm': Mute");
     prefresh(this->viewport, 0, viewportCol, 1, 1, viewportRows, viewCols);
+    this->updateScrollers();
 }
 
 void MixerWindow::updateScrollers(){
-    if (this->minPanelPos > 0){
+    uint numPages  = this->getNumPages();
+    uint curPage   = this->getCurrentPage();
+
+    if (curPage > 1 && numPages > 1){
         this->drawScroller(DIR_LEFT);
     }
 
-    if (this->maxPanelPos < this->mixerPanels.size()-1){
+    if (curPage < numPages){
         this->drawScroller(DIR_RIGHT);
     }
 }
@@ -253,4 +256,17 @@ void MixerWindow::muteMixer(){
     this->curPanel->mute();
     this->mgr.updateMixer(this->curPanel->getMixer());
     this->updateViewport();
+}
+
+uint MixerWindow::getCurrentPage(){
+    uint numVis    = this->getNumVisiblePanels();
+
+    return std::ceil((float)(this->curPanelPos+1) / (float)numVis);
+}
+
+uint MixerWindow::getNumPages(){
+    uint numPanels = this->mixerPanels.size();
+    uint numVis    = this->getNumVisiblePanels();
+
+    return std::ceil((float)numPanels / (float)numVis);
 }
