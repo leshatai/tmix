@@ -17,8 +17,9 @@ MixerWindow::MixerWindow(const MixerManager &mgr) :
     mgr(mgr),
     curPanel(nullptr),
     minPanelPos(0),
-    maxPanelPos(6){
-        this->viewport = nullptr;
+    maxPanelPos(6),
+    pageFlip(false),
+    viewport(nullptr) {
         this->initMixers();
     }
 
@@ -31,7 +32,10 @@ void MixerWindow::show(){
     this->init();
     this->drawMixers();
     this->selectMixer(0);
-    this->handleInput();	
+    if (this->getNumPages() > 1){
+        this->drawScroller(DIR_RIGHT);
+    }
+    this->handleInput();
 }
 
 WINDOW* MixerWindow::getViewport(){
@@ -152,6 +156,9 @@ void MixerWindow::selectMixer(int pos){
         return;
     }
 
+    uint oldPage = this->getCurrentPage();
+    uint newPage = oldPage;
+
     // scroll left
     if (pos < this->minPanelPos){
         this->scrollPanels(DIR_LEFT);
@@ -161,6 +168,9 @@ void MixerWindow::selectMixer(int pos){
     if (pos > this->maxPanelPos){
         this->scrollPanels(DIR_RIGHT);
     }
+
+    newPage = this->getCurrentPage();
+    this->pageFlip = (oldPage != newPage);
 
     if(this->curPanel){
         this->curPanel.get()->draw();
@@ -178,7 +188,17 @@ void MixerWindow::drawScroller(int dir){
     std::string dirSymbol = dir == DIR_LEFT ? IND_LEFT : IND_RIGHT;
 
     for (uint i=0; i < rows; i++){
-        mvprintw(6+i, col, dirSymbol.c_str());
+        mvaddstr(6+i, col, dirSymbol.c_str());
+    }
+}
+
+void MixerWindow::removeScroller(int dir){
+    uint rows = 9;
+    uint col  = dir == DIR_LEFT ? 1 : this->width - 2; 
+    std::string dirSymbol = dir == DIR_LEFT ? IND_LEFT : IND_RIGHT;
+
+    for (uint i=0; i < rows; i++){
+        mvaddstr(6+i, col, " ");
     }
 }
 
@@ -188,7 +208,7 @@ void MixerWindow::scrollPanels(int dir){
     if ((this->minPanelPos == 0 && dir == DIR_LEFT) ||
         (this->maxPanelPos == numPanels && dir == DIR_RIGHT)){
         return;
-    }    
+    }
 
     this->minPanelPos += dir;
     this->maxPanelPos += dir;
@@ -215,12 +235,8 @@ void MixerWindow::adjustVolume(uint dir){
 void MixerWindow::updateViewport(){
     uint viewportCols = this->mixerPanels.size()*MixerPanel::WIDTH_MAIN;
     uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
-    uint viewportCol  = this->minPanelPos*MixerPanel::WIDTH_MAIN;
+    uint viewportCol  = this->minPanelPos * MixerPanel::WIDTH_MAIN;
     uint viewCols     = this->getNumVisiblePanels() * MixerPanel::WIDTH_MAIN;
-
-    if (this->curPanelPos < this->maxPanelPos){
-        viewportCol = 0;
-    }
 
     if (viewCols > viewportCols){
         viewCols = viewportCols;
@@ -229,22 +245,31 @@ void MixerWindow::updateViewport(){
     if (this->curPanel){
         this->curPanel.get()->highlight();
     }
-
-    mvprintw(1, 2, "Keys: 'q': Quit | 'm': Mute");
-    prefresh(this->viewport, 0, viewportCol, 1, 1, viewportRows, viewCols);
-    this->updateScrollers();
+    
+    mvaddstr(1, 2, "Keys: 'q': Quit | 'm': Mute");
+    if (this->pageFlip){
+        this->pageFlip = false;
+        this->updateScrollers();
+    }
+    wnoutrefresh(stdscr);
+    pnoutrefresh(this->viewport, 0, viewportCol, 2, 2, viewportRows, viewCols);
+    doupdate();
 }
 
 void MixerWindow::updateScrollers(){
     uint numPages  = this->getNumPages();
     uint curPage   = this->getCurrentPage();
 
-    if (curPage > 1 && numPages > 1){
-        this->drawScroller(DIR_LEFT);
-    }
-
     if (curPage < numPages){
         this->drawScroller(DIR_RIGHT);
+    } else {
+        this->removeScroller(DIR_RIGHT);
+    }
+
+    if (curPage > 1 && numPages > 1){
+        this->drawScroller(DIR_LEFT);
+    } else {
+        this->removeScroller(DIR_LEFT);
     }
 }
 
@@ -259,7 +284,7 @@ void MixerWindow::muteMixer(){
 }
 
 uint MixerWindow::getCurrentPage(){
-    uint numVis    = this->getNumVisiblePanels();
+    uint numVis = this->getNumVisiblePanels();
 
     return std::ceil((float)(this->curPanelPos+1) / (float)numVis);
 }

@@ -32,6 +32,7 @@ class MixerWindow : MixerWindowInterface {
         uint minPanelPos;
         /** upper boundary in view port */
         uint maxPanelPos;
+        bool pageFlip;
         WINDOW *viewport;
 
         /**
@@ -78,6 +79,8 @@ class MixerWindow : MixerWindowInterface {
          * Draws the scroll indicators
          */
         void drawScroller(int dir);
+
+        void removeScroller(int dir);
 
         /**
          * Scrolls viewport left/right to show current selected mixer
