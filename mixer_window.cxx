@@ -303,8 +303,7 @@ void MixerWindow::scrollPanels(int dir, bool pagewise){
     uint pos          = this->curPanelPos;
 
     if (!pagewise){
-        if ((this->minPanelPos == 0 && dir == DIR_LEFT) ||
-            (this->maxPanelPos == numPanels - 1 && dir == DIR_RIGHT)){
+        if ((pos == 0 && dir == DIR_LEFT) || (pos == numPanels - 1 && dir == DIR_RIGHT)){
             return;
         }
 
