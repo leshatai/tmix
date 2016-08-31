@@ -17,10 +17,11 @@ class MixerWindow : MixerWindowInterface {
         static const int VOL_DOWN  = 2;
 
         static const int PAD_HEIGHT_VIEWPORT = 3;
-        static const int PAD_WIDTH_VIEWPORT = 6;
+        static const int PAD_WIDTH_VIEWPORT  = 6;
 
         static const std::string IND_LEFT;
         static const std::string IND_RIGHT;
+        static const std::string BLANK;
 
         uint width;
         uint height;
@@ -43,11 +44,6 @@ class MixerWindow : MixerWindowInterface {
          * Initializes all mixer devices
          */
         void initMixers();
-
-        /**
-         * Draws all mixers to viewport
-         */
-        void drawMixers();
 
         /**
          * Returns the page of the currently selected panel
@@ -77,9 +73,7 @@ class MixerWindow : MixerWindowInterface {
         /**
          * Draws the scroll indicators
          */
-        void drawScroller(int dir);
-
-        void removeScroller(int dir);
+        void drawScroller(int dir, bool remove);
 
         /**
          * Scrolls viewport left/right to show current selected mixer

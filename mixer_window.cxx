@@ -9,6 +9,7 @@
 
 const std::string MixerWindow::IND_LEFT  = "<";
 const std::string MixerWindow::IND_RIGHT = ">";
+const std::string MixerWindow::BLANK     = " ";
 
 MixerWindow::MixerWindow(const MixerManager &mgr) :
     width(80),
@@ -29,7 +30,6 @@ MixerWindow::~MixerWindow(){
 
 void MixerWindow::show(){
     this->init();
-    this->drawMixers();
     this->selectMixer(0);
     this->handleInput();
 }
@@ -92,6 +92,10 @@ void MixerWindow::init(){
     uint viewportCols = this->mgr.getMixers().size()*MixerPanel::WIDTH_MAIN;
     this->viewport    = newpad(viewportRows, viewportCols);
 
+    for(auto &panel : this->mixerPanels){
+        panel.draw();
+    }
+
     box(stdscr, 0, 0);
     refresh();
 }
@@ -105,12 +109,6 @@ void MixerWindow::initMixers(){
         panelNr++;
     }
 
-}
-
-void MixerWindow::drawMixers(){
-    for(auto &panel : this->mixerPanels){
-        panel.draw();
-    }
 }
 
 void MixerWindow::handleInput(){
@@ -168,23 +166,17 @@ void MixerWindow::selectMixer(uint pos){
     this->updateViewport();
 }
 
-void MixerWindow::drawScroller(int dir){
+void MixerWindow::drawScroller(int dir, bool remove){
     uint rows = 9;
     uint col  = dir == DIR_LEFT ? 1 : this->width - 2; 
     std::string dirSymbol = dir == DIR_LEFT ? IND_LEFT : IND_RIGHT;
+
+    if (remove){
+        dirSymbol = BLANK;
+    }
 
     for (uint i=0; i < rows; i++){
         mvaddstr(6+i, col, dirSymbol.c_str());
-    }
-}
-
-void MixerWindow::removeScroller(int dir){
-    uint rows = 9;
-    uint col  = dir == DIR_LEFT ? 1 : this->width - 2; 
-    std::string dirSymbol = dir == DIR_LEFT ? IND_LEFT : IND_RIGHT;
-
-    for (uint i=0; i < rows; i++){
-        mvaddstr(6+i, col, " ");
     }
 }
 
@@ -228,19 +220,11 @@ void MixerWindow::updateViewport(){
 }
 
 void MixerWindow::updateScrollers(){
-    uint numPanels = this->mixerPanels.size();
+    bool removeRight = this->maxPanelPos == this->mixerPanels.size() - 1;
+    bool removeLeft  = this->minPanelPos == 0;
 
-    if (this->maxPanelPos < numPanels -1){
-        this->drawScroller(DIR_RIGHT);
-    } else {
-        this->removeScroller(DIR_RIGHT);
-    }
-
-    if (this->minPanelPos > 0){
-        this->drawScroller(DIR_LEFT);
-    } else {
-        this->removeScroller(DIR_LEFT);
-    }
+    this->drawScroller(DIR_RIGHT, removeRight);
+    this->drawScroller(DIR_LEFT, removeLeft);
 }
 
 void MixerWindow::muteMixer(){
