@@ -18,6 +18,8 @@ WFORMAT=0
 
 .ifdef DEBUG
 CXXFLAGS += -g
+.else
+CXXFLAGS += -O3
 .endif
 
 DPADD=	${LIBNCURSES}

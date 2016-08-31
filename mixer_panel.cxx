@@ -60,6 +60,7 @@ void MixerPanel::resize(){
     wresize(this->mainWindow, this->heightMain, WIDTH_MAIN);
     wresize(this->scaleWindow, this->heightScale, WIDTH_SCALE);
     mvderwin(this->labelWindow, this->heightScale+1, 2);
+    wresize(this->labelWindow, this->heightLabel, WIDTH_LABEL);
 
     this->draw();
 }
@@ -174,7 +175,7 @@ void MixerPanel::drawLabel(){
     // fill with spaces until position 15
     //txt << std::setw(8-this->device.getName().length()) << std::setfill(' ') << std::right;
     // print mixer name
-    txt << this->device.getName() << std::endl;
+    txt << this->device.getName();
     mvwprintw(label, 1, 0, txt.str().c_str());
 }
 

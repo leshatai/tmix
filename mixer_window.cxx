@@ -41,6 +41,7 @@ WINDOW* MixerWindow::getViewport(){
 void MixerWindow::resize(){
     uint oldHeight = this->height;
     getmaxyx(stdscr, this->height, this->width);
+    clear();
 
     uint numPanels    = this->mixerPanels.size();
     uint numVisPanels = this->getNumVisiblePanels();
@@ -68,9 +69,8 @@ void MixerWindow::resize(){
         this->maxPanelPos  = this->curPanelPos;
     }
 
-    clear();
+    //clear();
     box(stdscr, 0, 0);
-    refresh();
     this->updateViewport();
 }
 
