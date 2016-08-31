@@ -18,7 +18,6 @@ MixerWindow::MixerWindow(const MixerManager &mgr) :
     curPanel(nullptr),
     minPanelPos(0),
     maxPanelPos(6),
-    pageFlip(false),
     viewport(nullptr) {
         this->initMixers();
     }
@@ -32,9 +31,6 @@ void MixerWindow::show(){
     this->init();
     this->drawMixers();
     this->selectMixer(0);
-    if (this->getNumPages() > 1){
-        this->drawScroller(DIR_RIGHT);
-    }
     this->handleInput();
 }
 
@@ -162,12 +158,6 @@ void MixerWindow::selectMixer(uint pos){
         return;
     }
 
-    uint oldPage = this->getCurrentPage();
-    uint newPage = oldPage;
-
-    newPage = this->getCurrentPage();
-    this->pageFlip = (oldPage != newPage);
-
     if(this->curPanel){
         this->curPanel.get()->draw();
     }
@@ -197,19 +187,7 @@ void MixerWindow::removeScroller(int dir){
         mvaddstr(6+i, col, " ");
     }
 }
-/*
-void MixerWindow::scrollPanels(int dir){
-    uint numPanels    = this->mixerPanels.size()-1;
 
-    if ((this->minPanelPos == 0 && dir == DIR_LEFT) ||
-        (this->maxPanelPos == numPanels && dir == DIR_RIGHT)){
-        return;
-    }
-
-    this->minPanelPos += dir;
-    this->maxPanelPos += dir;
-}
-*/
 uint MixerWindow::getNumVisiblePanels(){
     return (this->width - PAD_WIDTH_VIEWPORT)  / MixerPanel::WIDTH_MAIN;
 }
@@ -250,21 +228,15 @@ void MixerWindow::updateViewport(){
 }
 
 void MixerWindow::updateScrollers(){
-    uint numPages  = this->getNumPages();
-    uint curPage   = this->getCurrentPage();
+    uint numPanels = this->mixerPanels.size();
 
-    std::ostringstream txt;
-    txt << curPage << "|" << numPages << "|" << 
-        this->curPanelPos << "|" << this->minPanelPos << "|" << this->maxPanelPos;
-
-    mvprintw(1, 50, txt.str().c_str());
-    if (curPage < numPages){
+    if (this->maxPanelPos < numPanels -1){
         this->drawScroller(DIR_RIGHT);
     } else {
         this->removeScroller(DIR_RIGHT);
     }
 
-    if (curPage > 1 && numPages > 1){
+    if (this->minPanelPos > 0){
         this->drawScroller(DIR_LEFT);
     } else {
         this->removeScroller(DIR_LEFT);

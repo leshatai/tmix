@@ -32,7 +32,6 @@ class MixerWindow : MixerWindowInterface {
         uint minPanelPos;
         /** upper boundary in view port */
         uint maxPanelPos;
-        bool pageFlip;
         WINDOW *viewport;
 
         /**
