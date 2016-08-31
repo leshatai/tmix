@@ -68,7 +68,7 @@ class MixerWindow : MixerWindowInterface {
         /**
          * Selects mixer with given number
          */
-        void selectMixer(int pos);
+        void selectMixer(uint pos);
 
         /**
          * Mutes/Unmutes current mixer
@@ -85,7 +85,7 @@ class MixerWindow : MixerWindowInterface {
         /**
          * Scrolls viewport left/right to show current selected mixer
          */
-        void scrollPanels(int dir);
+        void scrollPanels(int dir, bool pagewise);
 
         /**
          * In-/Decreases volume according to given direction

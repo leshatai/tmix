@@ -134,10 +134,16 @@ void MixerWindow::handleInput(){
                 this->adjustVolume(VOL_UP);
                 break;
             case KEY_LEFT:
-                this->selectMixer(this->curPanelPos-1);
+                this->scrollPanels(DIR_LEFT, false);
                 break;
             case KEY_RIGHT:
-                this->selectMixer(this->curPanelPos+1);
+                this->scrollPanels(DIR_RIGHT, false);
+                break;
+            case KEY_NPAGE:
+                this->scrollPanels(DIR_LEFT, true);
+                break;
+            case KEY_PPAGE:
+                this->scrollPanels(DIR_RIGHT, true);
                 break;
             case 'm':
                     this->muteMixer();
@@ -151,23 +157,13 @@ void MixerWindow::handleInput(){
     }
 }
 
-void MixerWindow::selectMixer(int pos){
+void MixerWindow::selectMixer(uint pos){
     if (pos < 0 || pos > this->mixerPanels.size()-1){
         return;
     }
 
     uint oldPage = this->getCurrentPage();
     uint newPage = oldPage;
-
-    // scroll left
-    if (pos < this->minPanelPos){
-        this->scrollPanels(DIR_LEFT);
-    }
-
-    // scroll right
-    if (pos > this->maxPanelPos){
-        this->scrollPanels(DIR_RIGHT);
-    }
 
     newPage = this->getCurrentPage();
     this->pageFlip = (oldPage != newPage);
@@ -201,7 +197,7 @@ void MixerWindow::removeScroller(int dir){
         mvaddstr(6+i, col, " ");
     }
 }
-
+/*
 void MixerWindow::scrollPanels(int dir){
     uint numPanels    = this->mixerPanels.size()-1;
 
@@ -213,7 +209,7 @@ void MixerWindow::scrollPanels(int dir){
     this->minPanelPos += dir;
     this->maxPanelPos += dir;
 }
-
+*/
 uint MixerWindow::getNumVisiblePanels(){
     return (this->width - PAD_WIDTH_VIEWPORT)  / MixerPanel::WIDTH_MAIN;
 }
@@ -245,12 +241,9 @@ void MixerWindow::updateViewport(){
     if (this->curPanel){
         this->curPanel.get()->highlight();
     }
-    
+
     mvaddstr(1, 2, "Keys: 'q': Quit | 'm': Mute");
-    if (this->pageFlip){
-        this->pageFlip = false;
-        this->updateScrollers();
-    }
+    this->updateScrollers();
     wnoutrefresh(stdscr);
     pnoutrefresh(this->viewport, 0, viewportCol, 2, 2, viewportRows, viewCols);
     doupdate();
@@ -260,6 +253,11 @@ void MixerWindow::updateScrollers(){
     uint numPages  = this->getNumPages();
     uint curPage   = this->getCurrentPage();
 
+    std::ostringstream txt;
+    txt << curPage << "|" << numPages << "|" << 
+        this->curPanelPos << "|" << this->minPanelPos << "|" << this->maxPanelPos;
+
+    mvprintw(1, 50, txt.str().c_str());
     if (curPage < numPages){
         this->drawScroller(DIR_RIGHT);
     } else {
@@ -294,4 +292,49 @@ uint MixerWindow::getNumPages(){
     uint numVis    = this->getNumVisiblePanels();
 
     return std::ceil((float)numPanels / (float)numVis);
+}
+
+void MixerWindow::scrollPanels(int dir, bool pagewise){
+    if (dir != DIR_LEFT && dir != DIR_RIGHT){
+        return;
+    }
+
+    uint numPanels    = this->mixerPanels.size();
+    uint pos          = this->curPanelPos;
+
+    if (!pagewise){
+        if ((this->minPanelPos == 0 && dir == DIR_LEFT) ||
+            (this->maxPanelPos == numPanels - 1 && dir == DIR_RIGHT)){
+            return;
+        }
+
+        pos += dir;
+        // we only update boundaries, if we step over them
+        if (pos < this->minPanelPos || pos > this->maxPanelPos){
+            this->minPanelPos += dir;
+            this->maxPanelPos += dir;
+        }
+    } else {
+        uint numVisPanels = this->getNumVisiblePanels();
+        uint curPage      = this->getCurrentPage();
+        uint numPages     = this->getNumPages();
+        uint nextPage     = curPage + dir;
+
+        if (nextPage > numPages || nextPage < 1){
+            return;
+        }
+
+        pos               = nextPage == 1 ? 0 : (curPage * numVisPanels);
+        uint maxPanelPos  = pos + (numVisPanels - 1);
+        this->minPanelPos = pos;
+        this->maxPanelPos = maxPanelPos < numPanels ? maxPanelPos : numPanels - 1;
+
+        // avoid scrolling behind last mixer panel
+        if (this->maxPanelPos - numVisPanels < this->minPanelPos){
+            this->minPanelPos = this->maxPanelPos - (numVisPanels - 1);
+            pos = this->maxPanelPos;
+        }
+    }
+
+    this->selectMixer(pos);
 }
