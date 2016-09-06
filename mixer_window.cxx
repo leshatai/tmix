@@ -93,7 +93,9 @@ void MixerWindow::init(){
     //nodelay(stdscr, true); // this causes 100% cpu usage
 
     getmaxyx(stdscr, this->height, this->width);
-    this->maxPanelPos = this->getNumVisiblePanels()-1;
+    uint numVisPanels = this->getNumVisiblePanels() - 1;
+    uint numPanels    = this->mixerPanels.size() - 1;
+    this->maxPanelPos = numVisPanels > numPanels ? numPanels : numVisPanels;
     uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
     uint viewportCols = this->mgr.getMixerCount()*MixerPanel::WIDTH;
     this->viewport    = newpad(viewportRows, viewportCols);
