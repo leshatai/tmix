@@ -10,7 +10,7 @@
 #include <string>
 #include <iostream>
 
-#include "mixer_manager.hpp"
+#include "dragonfly_manager.hpp"
 #include "mixer_window.hpp"
 
 int main(int argc, char* argv[]){
@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     std::string devName = argc > 1 ? argv[1] : DEFAULT_DEV;
 
     try {
-        MixerManager mixerMgr(devName);
+        DragonFlyManager mixerMgr(devName);
         MixerWindow  window(mixerMgr);
         window.show();
     } catch(std::exception &e) {

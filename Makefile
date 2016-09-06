@@ -3,10 +3,10 @@
 PROG=	tmix
 MAN=	
 SRCS=\
-        mixer_manager.cxx \
+        dragonfly_manager.cxx \
         mixer_window.cxx \
         mixer_panel.cxx \
-    	mixer_device.cxx \
+        mixer_device.cxx \
         main.cxx
 
 CC=c++

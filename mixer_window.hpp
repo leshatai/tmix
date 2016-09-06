@@ -1,7 +1,6 @@
 #ifndef __MIXER_WINDOW_H__
 #define __MIXER_WINDOW_H__
 
-#include "mixer_window_interface.hpp"
 #include "mixer_manager.hpp"
 #include "mixer_panel.hpp"
 
@@ -9,7 +8,7 @@
 #include <memory>
 #include <ncurses.h>
 
-class MixerWindow : MixerWindowInterface {
+class MixerWindow {
     protected:
         static const int DIR_LEFT  = -1;
         static const int DIR_RIGHT = 1;
@@ -26,7 +25,7 @@ class MixerWindow : MixerWindowInterface {
         uint width;
         uint height;
         uint curPanelPos;
-        MixerManager mgr;
+        MixerManager &mgr;
         std::shared_ptr<MixerPanel> curPanel;
         std::vector<MixerPanel> mixerPanels;
         /** lower boundary in view port */
@@ -110,7 +109,7 @@ class MixerWindow : MixerWindowInterface {
         /**
          * Std. constructor
          */
-        MixerWindow(const MixerManager &mgr);
+        MixerWindow(MixerManager &mgr);
 
         /**
          * Std. destructor
@@ -121,12 +120,6 @@ class MixerWindow : MixerWindowInterface {
          * Shows the mixer window
          */
         void show();
-
-        /**
-         * Returns current viewport size
-         */
-        std::tuple<uint, uint> getSize();
-        WINDOW* getViewport();
 };
 
 #endif

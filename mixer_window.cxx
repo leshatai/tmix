@@ -5,13 +5,15 @@
 #include <sstream>
 #include <cmath>
 
+
+#include "mixer_device.hpp"
 #include "mixer_window.hpp"
 
 const std::string MixerWindow::IND_LEFT  = "<";
 const std::string MixerWindow::IND_RIGHT = ">";
 const std::string MixerWindow::BLANK     = " ";
 
-MixerWindow::MixerWindow(const MixerManager &mgr) :
+MixerWindow::MixerWindow(MixerManager &mgr) :
     width(80),
     height(25), 
     curPanelPos(0),
@@ -34,26 +36,30 @@ void MixerWindow::show(){
     this->handleInput();
 }
 
-WINDOW* MixerWindow::getViewport(){
-    return this->viewport;
-}
-
 void MixerWindow::resize(){
     uint oldHeight = this->height;
     getmaxyx(stdscr, this->height, this->width);
-    clear();
 
     uint numPanels    = this->mixerPanels.size();
     uint numVisPanels = this->getNumVisiblePanels();
-
     this->maxPanelPos = numVisPanels-1;
     this->height      = this->height >= 10 ? this->height : 10;
 
     // do we have to resize the panels ?
     if (this->height != oldHeight){
-        wresize(this->viewport, this->height - PAD_HEIGHT_VIEWPORT, numPanels*MixerPanel::WIDTH_MAIN);
+        uint viewportHeight = this->height - PAD_HEIGHT_VIEWPORT;
+        bool isBigger       = oldHeight < this->height;
+        werase(this->viewport);
+        if (isBigger ){
+            wresize(this->viewport, viewportHeight, numPanels*MixerPanel::WIDTH);
+        }
+
         for(auto &panel : this->mixerPanels){
-            panel.resize();
+            panel.resize(oldHeight, viewportHeight);
+        }
+
+        if (!isBigger ){
+            wresize(this->viewport, viewportHeight, numPanels*MixerPanel::WIDTH);
         }
     }
 
@@ -69,7 +75,7 @@ void MixerWindow::resize(){
         this->maxPanelPos  = this->curPanelPos;
     }
 
-    //clear();
+    clear();
     box(stdscr, 0, 0);
     this->updateViewport();
 }
@@ -89,10 +95,12 @@ void MixerWindow::init(){
     getmaxyx(stdscr, this->height, this->width);
     this->maxPanelPos = this->getNumVisiblePanels()-1;
     uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
-    uint viewportCols = this->mgr.getMixers().size()*MixerPanel::WIDTH_MAIN;
+    uint viewportCols = this->mgr.getMixerCount()*MixerPanel::WIDTH;
     this->viewport    = newpad(viewportRows, viewportCols);
 
     for(auto &panel : this->mixerPanels){
+        panel.init(*this->viewport);
+
         panel.draw();
     }
 
@@ -103,8 +111,8 @@ void MixerWindow::init(){
 void MixerWindow::initMixers(){
     uint panelNr   = 0;
 
-    for(MixerDevice &dev : this->mgr.getMixers()){
-        MixerPanel panel(panelNr, dev, *this);
+    for(auto &dev : this->mgr.getMixers()){
+        MixerPanel panel(panelNr, dev);
         this->mixerPanels.push_back(panel);
         panelNr++;
     }
@@ -157,7 +165,7 @@ void MixerWindow::selectMixer(uint pos){
     }
 
     if(this->curPanel){
-        this->curPanel.get()->draw();
+        this->curPanel.get()->drawLabel();
     }
 
     this->curPanelPos = pos;
@@ -181,7 +189,7 @@ void MixerWindow::drawScroller(int dir, bool remove){
 }
 
 uint MixerWindow::getNumVisiblePanels(){
-    return (this->width - PAD_WIDTH_VIEWPORT)  / MixerPanel::WIDTH_MAIN;
+    return (this->width - PAD_WIDTH_VIEWPORT)  / MixerPanel::WIDTH;
 }
 
 void MixerWindow::adjustVolume(uint dir){
@@ -199,10 +207,12 @@ void MixerWindow::adjustVolume(uint dir){
 }
 
 void MixerWindow::updateViewport(){
-    uint viewportCols = this->mixerPanels.size()*MixerPanel::WIDTH_MAIN;
-    uint viewportRows = this->height - PAD_HEIGHT_VIEWPORT;
-    uint viewportCol  = this->minPanelPos * MixerPanel::WIDTH_MAIN;
-    uint viewCols     = this->getNumVisiblePanels() * MixerPanel::WIDTH_MAIN;
+    // we have to add one column, else we would right most col of the last panel
+    // would be cut off
+    uint viewportCols = (this->mixerPanels.size()*MixerPanel::WIDTH) + 1;
+    uint viewportRows = this->height - (PAD_HEIGHT_VIEWPORT - 1);
+    uint viewportCol  = this->minPanelPos * MixerPanel::WIDTH;
+    uint viewCols     = (this->getNumVisiblePanels() * MixerPanel::WIDTH) + 1;
 
     if (viewCols > viewportCols){
         viewCols = viewportCols;

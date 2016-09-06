@@ -16,10 +16,10 @@ class MixerDevice {
     public:
         MixerDevice(uint mixerNr, std::string name, uint volLeft, uint volRight);
 
-        uint getNumber() const { return nr; }
-        std::string getName() const { return name; }
-        uint getVolumeLeft() const { return volLeft; }
-        uint getVolumeRight() const { return volRight; }
+        uint getNumber() { return nr; }
+        std::string getName() { return name; }
+        uint getVolumeLeft() { return volLeft; }
+        uint getVolumeRight() { return volRight; }
         void setVolume(uint vol);
         void setVolume(uint left, uint right);
 

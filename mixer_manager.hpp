@@ -1,20 +1,22 @@
-#ifndef __MIXER_MANAGER_H__
-#define __MIXER_MANAGER_H__
+#ifndef __MIXER_MANAGER_INTERFACE_H__
+#define __MIXER_MANAGER_INTERFACE_H__
 
-#include <vector>
 #include <string>
+#include <vector>
+
 #include "mixer_device.hpp"
 
-class MixerManager{
-private:
-	int deviceHndl;
-	std::string device;
-	std::vector<MixerDevice> mixers;
-public:
-	MixerManager(std::string device);
-	std::vector<MixerDevice> &getMixers(){ return mixers; }
-	void updateMixer(MixerDevice mixer);
-	uint getMixerCount(){ return this->mixers.size(); }
+class MixerManager {
+    protected:
+        std::vector<MixerDevice> mixers;
+        std::string device;
+    public:
+        MixerManager(std::string device) : device(device) {}
+
+        std::vector<MixerDevice> &getMixers() { return this->mixers; }
+        uint getMixerCount() { return this->mixers.size(); }
+
+        virtual void updateMixer(MixerDevice &mixer) = 0;
 };
 
 #endif
