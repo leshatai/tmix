@@ -10,6 +10,12 @@ SRCS=\
         main.cxx
 
 CC=c++
+CXX=c++
+.ifdef CLANG
+CC=clang++38
+CXX=clang++38
+.endif
+
 CXXFLAGS=-std=c++14 -Wall
 CXXFLAGS+=-I${.CURDIR}
 YFLAGS=
