@@ -27,7 +27,7 @@ class MixerWindow {
         uint curPanelPos;
         MixerManager &mgr;
         std::shared_ptr<MixerPanel> curPanel;
-        std::vector<MixerPanel> mixerPanels;
+        std::vector<std::shared_ptr<MixerPanel>> mixerPanels;
         /** lower boundary in view port */
         uint minPanelPos;
         /** upper boundary in view port */

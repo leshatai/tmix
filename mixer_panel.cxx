@@ -45,17 +45,17 @@ void MixerPanel::decreaseVolume(){
     this->draw();
 }
 
-void MixerPanel::resize(uint oldViewportHeight, uint viewportHeight){
+void MixerPanel::resize(uint oldViewportHeight, uint newViewportHeight){
     werase(this->labelWindow);
     werase(this->scaleWindow);
-    this->calculateSizes(viewportHeight);
+    this->calculateSizes(newViewportHeight);
 
     uint beginX = this->pos*WIDTH;
 
     // we have to check if the viewport size is smaller or bigger
     // to avoid overlapping windows, when moving an resizing,
     // else we would cause a SEGFAULT.
-    if (oldViewportHeight > viewportHeight){
+    if (oldViewportHeight > newViewportHeight){
         wresize(this->scaleWindow, this->heightScale, WIDTH_SCALE);
         mvderwin(this->labelWindow, this->heightScale+1, beginX+2);
     } else {

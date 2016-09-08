@@ -49,7 +49,7 @@ class MixerPanel{
         void drawLabel();
         void draw();
         void draw(uint viewportHeight);
-        void resize(uint oldViewportHeight, uint viewportHeight);
+        void resize(uint oldViewportHeight, uint newViewportHeight);
 
         void decreaseVolume();
         void increaseVolume();

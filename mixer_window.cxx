@@ -55,7 +55,7 @@ void MixerWindow::resize(){
         }
 
         for(auto &panel : this->mixerPanels){
-            panel.resize(oldHeight, viewportHeight);
+            panel->resize(oldHeight, viewportHeight);
         }
 
         if (!isBigger ){
@@ -101,9 +101,8 @@ void MixerWindow::init(){
     this->viewport    = newpad(viewportRows, viewportCols);
 
     for(auto &panel : this->mixerPanels){
-        panel.init(*this->viewport);
-
-        panel.draw();
+        panel->init(*this->viewport);
+        panel->draw();
     }
 
     box(stdscr, 0, 0);
@@ -114,7 +113,7 @@ void MixerWindow::initMixers(){
     uint panelNr   = 0;
 
     for(auto &dev : this->mgr.getMixers()){
-        MixerPanel panel(panelNr, dev);
+        std::shared_ptr<MixerPanel> panel{new MixerPanel(panelNr, dev)};
         this->mixerPanels.push_back(panel);
         panelNr++;
     }
@@ -167,11 +166,11 @@ void MixerWindow::selectMixer(uint pos){
     }
 
     if(this->curPanel){
-        this->curPanel.get()->drawLabel();
+        this->curPanel->drawLabel();
     }
 
     this->curPanelPos = pos;
-    this->curPanel    = std::make_shared<MixerPanel>(this->mixerPanels.at(pos));
+    this->curPanel    = this->mixerPanels.at(pos);
 
     this->updateViewport();
 }
@@ -195,16 +194,14 @@ uint MixerWindow::getNumVisiblePanels(){
 }
 
 void MixerWindow::adjustVolume(uint dir){
-    MixerPanel *panel = this->curPanel.get();
-
     if (dir == VOL_DOWN){
-        panel->decreaseVolume();
+        this->curPanel->decreaseVolume();
     }
     if (dir == VOL_UP){
-        panel->increaseVolume();
+        this->curPanel->increaseVolume();
     }
 
-    this->mgr.updateMixer(panel->getMixer());
+    this->mgr.updateMixer(this->curPanel->getMixer());
     this->updateViewport();
 }
 
@@ -221,7 +218,7 @@ void MixerWindow::updateViewport(){
     }
 
     if (this->curPanel){
-        this->curPanel.get()->highlight();
+        this->curPanel->highlight();
     }
 
     mvaddstr(1, 2, "Keys: 'q': Quit | 'm': Mute");
