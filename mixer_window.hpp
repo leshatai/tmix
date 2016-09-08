@@ -101,6 +101,11 @@ class MixerWindow {
          */
         void updateScrollers();
 
+        /**
+         * Makes changes to mixer volume to specific channel
+         */
+        void toogleMixerChannel(uint channel);
+
     public:
         /**
          * Listens to user input (arrow keys) and calls the appropriate method

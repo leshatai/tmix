@@ -25,6 +25,7 @@ class MixerPanel{
         uint heightScale;
 
         uint pos;
+        uint channel;
         MixerDevice &device;
         WINDOW *labelWindow;
         WINDOW *scaleWindow;
@@ -37,9 +38,20 @@ class MixerPanel{
         bool isInitialized();
         void drawScale();
         void drawSingleScale(uint numLines, uint height, uint leftRight);
+        /**
+         * Returns the values for left/right channel to be used
+         * to de-/increase volume depending on active channel
+         * 
+         * First value is left, second value is right
+         */
+        std::pair<uint, uint> getChannelOffsets();
 
     public:
         static const uint WIDTH   = 10;
+
+        static const uint CHANNEL_LEFT  = 1;
+        static const uint CHANNEL_RIGHT = 2;
+        static const uint CHANNEL_BOTH  = 3;
 
         MixerPanel(uint pos, MixerDevice &device);
         ~MixerPanel();
@@ -49,7 +61,8 @@ class MixerPanel{
         void drawLabel();
         void draw();
         void draw(uint viewportHeight);
-        void resize(uint oldViewportHeight, uint newViewportHeight);
+        void resize(uint viewportHeight);
+        void toogleChannel(uint channel);
 
         void decreaseVolume();
         void increaseVolume();

@@ -55,7 +55,7 @@ void MixerWindow::resize(){
         }
 
         for(auto &panel : this->mixerPanels){
-            panel->resize(oldHeight, viewportHeight);
+            panel->resize(viewportHeight);
         }
 
         if (!isBigger ){
@@ -147,6 +147,15 @@ void MixerWindow::handleInput(){
                 break;
             case KEY_PPAGE:
                 this->scrollPanels(DIR_RIGHT, true);
+                break;
+            case 'b':
+                    this->toogleMixerChannel(MixerPanel::CHANNEL_BOTH);
+                break;
+            case 'r':
+                    this->toogleMixerChannel(MixerPanel::CHANNEL_RIGHT);
+                break;
+            case 'l':
+                    this->toogleMixerChannel(MixerPanel::CHANNEL_LEFT);
                 break;
             case 'm':
                     this->muteMixer();
@@ -301,4 +310,14 @@ void MixerWindow::scrollPanels(int dir, bool pagewise){
     }
 
     this->selectMixer(pos);
+}
+
+void MixerWindow::toogleMixerChannel(uint channel){
+    if (!this->curPanel){
+        return;
+    }
+
+    this->curPanel->toogleChannel(channel);
+    this->curPanel->draw();
+    this->updateViewport();
 }

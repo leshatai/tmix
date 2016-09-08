@@ -8,6 +8,7 @@ MixerPanel::MixerPanel(uint pos, MixerDevice &device) :
     heightLabel(3),
     heightScale(17),
     pos(pos),
+    channel(CHANNEL_BOTH),
     device(device){
         this->labelWindow = nullptr;
         this->scaleWindow = nullptr;
@@ -36,32 +37,27 @@ MixerDevice& MixerPanel::getMixer(){
 }
 
 void MixerPanel::increaseVolume(){
-    this->device.incVolume(3);
+    std::pair<uint, uint> vol = this->getChannelOffsets();
+
+    this->device.incVolume(vol.first, vol.second);
     this->draw();
 }
 
 void MixerPanel::decreaseVolume(){
-    this->device.decVolume(3);
+    std::pair<uint, uint> vol = this->getChannelOffsets();
+
+    this->device.decVolume(vol.first, vol.second);
     this->draw();
 }
 
-void MixerPanel::resize(uint oldViewportHeight, uint newViewportHeight){
+void MixerPanel::resize(uint viewportHeight){
     werase(this->labelWindow);
     werase(this->scaleWindow);
-    this->calculateSizes(newViewportHeight);
+    this->calculateSizes(viewportHeight);
 
     uint beginX = this->pos*WIDTH;
-
-    // we have to check if the viewport size is smaller or bigger
-    // to avoid overlapping windows, when moving an resizing,
-    // else we would cause a SEGFAULT.
-    if (oldViewportHeight > newViewportHeight){
-        wresize(this->scaleWindow, this->heightScale, WIDTH_SCALE);
-        mvderwin(this->labelWindow, this->heightScale+1, beginX+2);
-    } else {
-        mvderwin(this->labelWindow, this->heightScale+1, beginX+2);
-        wresize(this->scaleWindow, this->heightScale, WIDTH_SCALE);
-    }
+    mvderwin(this->labelWindow, this->heightScale+1, beginX+2);
+    wresize(this->scaleWindow, this->heightScale, WIDTH_SCALE);
 
     this->draw();
 }
@@ -176,4 +172,27 @@ void MixerPanel::calculateSizes(uint viewportHeight){
 
     this->heightLabel = 2;
     this->heightScale = (height - this->heightLabel) - 3; // 3 = border
+}
+
+void MixerPanel::toogleChannel(uint channel){
+    this->channel = channel;
+}
+
+std::pair<uint, uint> MixerPanel::getChannelOffsets(){
+    uint left = 3;
+    uint right = 3;
+
+    switch (this->channel){
+        case CHANNEL_LEFT:
+            right = 0;
+        break;
+        case CHANNEL_RIGHT:
+            left = 0;
+        break;
+        case CHANNEL_BOTH:
+        default:
+        break;
+    }
+
+    return std::make_pair(left, right);
 }
