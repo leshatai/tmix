@@ -106,11 +106,12 @@ class MixerWindow {
          */
         void toogleMixerChannel(uint channel);
 
-    public:
         /**
          * Listens to user input (arrow keys) and calls the appropriate method
          */
         void handleInput();
+
+    public:
         /**
          * Std. constructor
          */

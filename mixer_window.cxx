@@ -230,7 +230,7 @@ void MixerWindow::updateViewport(){
         this->curPanel->highlight();
     }
 
-    mvaddstr(1, 2, "Keys: 'q': Quit | 'm': Mute");
+    mvaddstr(1, 2, "Keys: 'q': Quit | 'm': Mute | 'l','r','b' : Toogle Channel");
     this->updateScrollers();
     wnoutrefresh(stdscr);
     pnoutrefresh(this->viewport, 0, viewportCol, 2, 2, viewportRows, viewCols);

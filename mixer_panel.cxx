@@ -144,6 +144,7 @@ void MixerPanel::drawScale(){
 void MixerPanel::drawLabel(){
     WINDOW *label = this->labelWindow;
     std::ostringstream txt;
+    std::string channelInd {""};
 
     // add current vol
     if (this->device.isMuted()){
@@ -159,7 +160,10 @@ void MixerPanel::drawLabel(){
     // fill with spaces until position 15
     //txt << std::setw(8-this->device.getName().length()) << std::setfill(' ') << std::right;
     // print mixer name
-    txt << this->device.getName();
+    if (this->channel != CHANNEL_BOTH) {
+        channelInd = this->channel == CHANNEL_LEFT ? "L)" : "R)";
+    }
+    txt << channelInd << this->device.getName();
     mvwprintw(label, 1, 0, txt.str().c_str());
 }
 
