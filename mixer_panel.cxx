@@ -200,3 +200,17 @@ std::pair<uint, uint> MixerPanel::getChannelOffsets(){
 
     return std::make_pair(left, right);
 }
+
+void MixerPanel::alignVolume(){
+    auto vol  = this->device.getVolume();
+    uint left  = vol.first;
+    uint right = vol.second;
+
+    if (left < right){
+        left = right;
+    } else {
+        right = left;
+    }
+
+    this->device.setVolume(left, right);
+}

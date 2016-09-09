@@ -87,6 +87,11 @@ class MixerWindow {
         void adjustVolume(uint dir);
 
         /**
+         * Aligns volume of left/right channel to the louder one
+         */
+        void alignVolume();
+
+        /**
          * Returns the number of panels that would fit in current window
          */
         uint getNumVisiblePanels();

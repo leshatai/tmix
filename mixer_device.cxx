@@ -73,3 +73,7 @@ void MixerDevice::unmute(){
     this->setVolume(muteVolLeft, muteVolRight);
     this->muted = false;
 }
+
+std::pair<uint, uint> MixerDevice::getVolume(){
+    return std::make_pair(this->volLeft, this->volRight);
+}

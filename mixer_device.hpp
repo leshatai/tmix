@@ -20,6 +20,8 @@ class MixerDevice {
         std::string getName() { return name; }
         uint getVolumeLeft() { return volLeft; }
         uint getVolumeRight() { return volRight; }
+        std::pair<uint, uint> getVolume();
+
         void setVolume(uint vol);
         void setVolume(uint left, uint right);
 

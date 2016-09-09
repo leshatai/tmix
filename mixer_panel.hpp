@@ -66,6 +66,7 @@ class MixerPanel{
 
         void decreaseVolume();
         void increaseVolume();
+        void alignVolume();
         void mute();
 };
 
