@@ -330,6 +330,7 @@ void MixerWindow::alignVolume(){
         return;
     }
 
+    this->curPanel->toogleChannel(MixerPanel::CHANNEL_BOTH);
     this->curPanel->alignVolume();
     this->mgr.updateMixer(this->curPanel->getMixer());
     this->curPanel->draw();
