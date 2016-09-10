@@ -23,10 +23,29 @@ MixerPanel::~MixerPanel(){
 }
 
 void MixerPanel::mute(){
-    if (this->device.isMuted()){
-        this->device.unmute();
-    } else {
-        this->device.mute();
+    switch(this->channel){
+        case CHANNEL_LEFT:
+            if (this->device.isMutedLeft()){
+                this->device.unmuteLeft();
+            } else {
+                this->device.muteLeft();
+            }
+            break;
+        case CHANNEL_RIGHT:
+            if (this->device.isMutedRight()){
+                this->device.unmuteRight();
+            } else {
+                this->device.muteRight();
+            }
+            break;
+        case CHANNEL_BOTH:
+        default:
+            if (this->device.isMuted()){
+                this->device.unmute();
+            } else {
+                this->device.mute();
+            }
+            break;
     }
 
     this->draw();
@@ -145,12 +164,20 @@ void MixerPanel::drawLabel(){
     WINDOW *label = this->labelWindow;
     std::ostringstream txt;
     std::string channelInd {""};
+    std::pair<uint, uint> vol = this->device.getVolume();
 
-    // add current vol
-    if (this->device.isMuted()){
-        txt << "M:M";
+    if (this->device.isMutedLeft()){
+        txt << "M";
     } else {
-        txt << this->device.getVolumeLeft() << ":" << this->device.getVolumeRight();
+        txt << vol.first;
+    }
+
+    txt << ":";
+
+    if (this->device.isMutedRight()){
+        txt << "M";
+    } else {
+        txt << vol.second;
     }
 
     // print number
@@ -211,6 +238,10 @@ void MixerPanel::alignVolume(){
     } else {
         right = left;
     }
+
+    // unmute no matter what
+    this->device.unmuteLeft();
+    this->device.unmuteRight();
 
     this->device.setVolume(left, right);
 }

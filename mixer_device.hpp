@@ -10,7 +10,8 @@ class MixerDevice {
         uint volLeft;
         uint volRight;
 
-        bool muted;
+        bool mutedLeft;
+        bool mutedRight;
         uint muteVolLeft;
         uint muteVolRight;
     public:
@@ -34,8 +35,16 @@ class MixerDevice {
         void decVolume(uint left, uint right);
 
         bool isMuted();
+        bool isMutedLeft();
+        bool isMutedRight();
+
         void mute();
+        void muteLeft();
+        void muteRight();
+
         void unmute();
+        void unmuteLeft();
+        void unmuteRight();
 };
 
 #endif

@@ -5,7 +5,8 @@ MixerDevice::MixerDevice(uint mixerNr, std::string name, uint volLeft, uint volR
     name(name),
     volLeft(volLeft),
     volRight(volRight),
-    muted(false),
+    mutedLeft(false),
+    mutedRight(false),
     muteVolLeft(volLeft),
     muteVolRight(volRight) {
     }
@@ -50,28 +51,78 @@ void MixerDevice::decVolume(uint left, uint right){
 }
 
 bool MixerDevice::isMuted(){
-    return this->muted;
+    return (this->mutedLeft && this->mutedRight);
+}
+
+bool MixerDevice::isMutedLeft(){
+    return this->mutedLeft;
+}
+
+bool MixerDevice::isMutedRight(){
+    return this->mutedRight;
 }
 
 void MixerDevice::mute(){
-    if (this->muted){
+    if (this->isMuted()){
         return;
     }
 
     this->muteVolLeft  = this->volLeft;
     this->muteVolRight = this->volRight;
-    this->muted      = true;
+    this->mutedLeft    = true;
+    this->mutedRight   = true;
 
     this->setVolume(0);
 }
 
+void MixerDevice::muteLeft(){
+    if (this->mutedLeft){
+        return;
+    }
+
+    this->muteVolLeft = this->volLeft;
+    this->mutedLeft   = true;
+    this->setVolume(0, this->volRight);
+}
+
+void MixerDevice::muteRight(){
+    if (this->mutedRight){
+        return;
+    }
+
+    this->muteVolRight = this->volRight;
+    this->mutedRight   = true;
+    this->setVolume(this->volLeft, 0);
+}
+
 void MixerDevice::unmute(){
-    if (!this->muted){
+    if (!this->isMuted()){
         return;
     }
 
     this->setVolume(muteVolLeft, muteVolRight);
-    this->muted = false;
+    this->mutedLeft  = false;
+    this->mutedRight = false;
+}
+
+void MixerDevice::unmuteLeft() {
+    if (!this->mutedLeft){
+        return;
+    }
+
+    this->volLeft   = this->muteVolLeft;
+    this->mutedLeft = false;
+    this->setVolume(this->muteVolLeft, this->volRight);
+}
+
+void MixerDevice::unmuteRight() {
+    if (!this->mutedRight){
+        return;
+    }
+
+    this->volRight   = this->muteVolRight;
+    this->mutedRight = false;
+    this->setVolume(this->volLeft, this->muteVolRight);
 }
 
 std::pair<uint, uint> MixerDevice::getVolume(){
