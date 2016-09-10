@@ -20,6 +20,6 @@ The executable can be found in the _obj_ directory.
 | Left/Right arrow key | Select mixer |
 | Up/Down arrow key | Adjust volume |
 | l,r,b | Toogle channel: L)eft, R)ight, B)oth |
-| m | (Un)mute mixer ot toogled channel |
+| m | (Un)mute mixer or toogled channel |
 | a | Align volumnes of both channels to the higher one. Channels get unmuted. |
 | q | Quit |
