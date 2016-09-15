@@ -51,7 +51,7 @@ class MixerDevice {
         std::string getName() { return name; }
         uint getVolumeLeft() { return volLeft; }
         uint getVolumeRight() { return volRight; }
-        std::pair<uint, uint> getVolume();
+        std::pair<uint, uint> getVolume() {  return std::make_pair(volLeft, volRight); }
 
         void setVolume(uint vol);
         void setVolume(uint left, uint right);
@@ -64,9 +64,9 @@ class MixerDevice {
         void decVolume(uint step);
         void decVolume(uint left, uint right);
 
-        bool isMuted();
-        bool isMutedLeft();
-        bool isMutedRight();
+        bool isMuted() { return (mutedLeft && mutedRight); }
+        bool isMutedLeft() { return mutedLeft; }
+        bool isMutedRight() { return mutedRight; }
 
         void mute();
         void muteLeft();

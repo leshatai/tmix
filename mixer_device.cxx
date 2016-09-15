@@ -78,18 +78,6 @@ void MixerDevice::decVolume(uint left, uint right){
     this->setVolume(volLeft, volRight);
 }
 
-bool MixerDevice::isMuted(){
-    return (this->mutedLeft && this->mutedRight);
-}
-
-bool MixerDevice::isMutedLeft(){
-    return this->mutedLeft;
-}
-
-bool MixerDevice::isMutedRight(){
-    return this->mutedRight;
-}
-
 void MixerDevice::mute(){
     if (this->isMuted()){
         return;
@@ -153,6 +141,3 @@ void MixerDevice::unmuteRight() {
     this->setVolume(this->volLeft, this->muteVolRight);
 }
 
-std::pair<uint, uint> MixerDevice::getVolume(){
-    return std::make_pair(this->volLeft, this->volRight);
-}
