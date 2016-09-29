@@ -29,14 +29,14 @@
 #include "mixer_device.hpp"
 
 MixerDevice::MixerDevice(uint mixerNr, std::string name, uint volLeft, uint volRight) : 
-    nr(mixerNr),
-    name(std::move(name)),
-    volLeft(volLeft),
-    volRight(volRight),
-    mutedLeft(false),
-    mutedRight(false),
-    muteVolLeft(volLeft),
-    muteVolRight(volRight) {
+    nr{mixerNr},
+    name{std::move(name)},
+    volLeft{volLeft},
+    volRight{volRight},
+    mutedLeft{false},
+    mutedRight{false},
+    muteVolLeft{volLeft},
+    muteVolRight{volRight} {
     }
 
 void MixerDevice::setVolume(uint vol){
@@ -69,8 +69,8 @@ void MixerDevice::decVolume(uint vol){
 }
 
 void MixerDevice::decVolume(uint left, uint right){
-    int volLeft = this->volLeft - left;
-    int volRight = this->volRight - right;
+    auto volLeft = this->volLeft - left;
+    auto volRight = this->volRight - right;
 
     volLeft  = volLeft  < 0 ? 0 : volLeft;
     volRight = volRight < 0 ? 0 : volRight;

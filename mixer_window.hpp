@@ -56,13 +56,13 @@ class MixerWindow {
         uint height;
         uint curPanelPos;
         MixerManager &mgr;
-        std::shared_ptr<MixerPanel> curPanel;
-        std::vector<std::shared_ptr<MixerPanel>> mixerPanels;
+        MixerPanel *curPanel;
+        std::vector<MixerPanel> mixerPanels;
         /** lower boundary in view port */
         uint minPanelPos;
         /** upper boundary in view port */
         uint maxPanelPos;
-        WINDOW *viewport;
+        std::shared_ptr<WINDOW> viewport;
 
         /**
          * Initializes ncurses window and mixer panels

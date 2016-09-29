@@ -33,11 +33,11 @@
 #include <sstream>
 
 MixerPanel::MixerPanel(uint pos, MixerDevice &device) :
-    heightLabel(3),
-    heightScale(17),
-    pos(pos),
-    channel(CHANNEL_BOTH),
-    device(device){
+    heightLabel{3},
+    heightScale{17},
+    pos{pos},
+    channel{CHANNEL_BOTH},
+    device{device}{
         this->labelWindow = nullptr;
         this->scaleWindow = nullptr;
     }
@@ -84,14 +84,14 @@ MixerDevice& MixerPanel::getMixer(){
 }
 
 void MixerPanel::increaseVolume(){
-    std::pair<uint, uint> vol = this->getChannelOffsets();
+    auto vol = this->getChannelOffsets();
 
     this->device.incVolume(vol.first, vol.second);
     this->draw();
 }
 
 void MixerPanel::decreaseVolume(){
-    std::pair<uint, uint> vol = this->getChannelOffsets();
+    auto vol = this->getChannelOffsets();
 
     this->device.decVolume(vol.first, vol.second);
     this->draw();
@@ -102,7 +102,7 @@ void MixerPanel::resize(uint viewportHeight){
     werase(this->scaleWindow);
     this->calculateSizes(viewportHeight);
 
-    uint beginX = this->pos*WIDTH;
+    auto beginX = this->pos*WIDTH;
     mvderwin(this->labelWindow, this->heightScale+1, beginX+2);
     wresize(this->scaleWindow, this->heightScale, WIDTH_SCALE);
 
@@ -110,7 +110,7 @@ void MixerPanel::resize(uint viewportHeight){
 }
 
 void MixerPanel::highlight(){
-    WINDOW *label = this->labelWindow;
+    auto *label = this->labelWindow;
 
     wattron(label, COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
     this->drawLabel();
@@ -131,8 +131,8 @@ void MixerPanel::draw(uint viewportHeight){
 }
 
 void MixerPanel::init(WINDOW &viewport){
-    uint height = 0;
-    uint width  = 0;
+    auto height = 0;
+    auto width  = 0;
     getmaxyx(&viewport, height, width);
     this->calculateSizes(height);
 
@@ -141,7 +141,7 @@ void MixerPanel::init(WINDOW &viewport){
     init_pair(COLOR_PAIR_RED, COLOR_RED, COLOR_BLACK);
     init_pair(COLOR_PAIR_WHITE, COLOR_WHITE, COLOR_BLACK);
 
-    uint beginX = this->pos*WIDTH;
+    auto beginX = this->pos*WIDTH;
 
     if (!this->scaleWindow){
         this->scaleWindow = derwin(&viewport, this->heightScale, WIDTH_SCALE, 1, beginX+3);
@@ -158,11 +158,11 @@ bool MixerPanel::isInitialized(){
 void MixerPanel::drawSingleScale(uint numLines, uint height, uint leftRight){
     uint numWhite = numLines*0.2;
     uint numRed   = numLines*0.1;
-    uint numGreen = numLines-(numWhite+numRed);
-    uint cp       = COLOR_PAIR_WHITE;
+    auto numGreen = numLines-(numWhite+numRed);
+    auto cp       = COLOR_PAIR_WHITE;
 
     WINDOW *scaleWindow = this->scaleWindow;
-    for(uint i=0; i < height; i++){
+    for(auto i=0u; i < height; i++){
         if(i > numWhite && i < numGreen){
             cp = COLOR_PAIR_GREEN;
         }
@@ -180,19 +180,20 @@ void MixerPanel::drawScale(){
     box(this->scaleWindow, 0, 0);
     // as we draw a border, the first and the last line are already
     // occupied with the border symbols
-    uint numLines    = this->heightScale-2;
-    uint heightLeft  = this->device.getVolumeLeft()*(numLines/100.0);
-    uint heightRight = this->device.getVolumeRight()*(numLines/100.0);
+    auto numLines    = this->heightScale-2;
+    auto heightLeft  = this->device.getVolumeLeft()*(numLines/100.0);
+    auto heightRight = this->device.getVolumeRight()*(numLines/100.0);
 
     this->drawSingleScale(numLines, heightLeft, SCALE_LEFT);
     this->drawSingleScale(numLines, heightRight, SCALE_RIGHT);
 }
 
 void MixerPanel::drawLabel(){
-    WINDOW *label = this->labelWindow;
+    auto *label     = this->labelWindow;
+    auto vol        = this->device.getVolume();
+    auto channelInd = "";
+
     std::ostringstream txt;
-    std::string channelInd {""};
-    std::pair<uint, uint> vol = this->device.getVolume();
 
     if (this->device.isMutedLeft()){
         txt << "M";
@@ -223,7 +224,7 @@ void MixerPanel::drawLabel(){
 }
 
 void MixerPanel::calculateSizes(uint viewportHeight){
-    uint height = viewportHeight;
+    auto height = viewportHeight;
 
     if (height < 10){
         height = 10;
@@ -238,8 +239,8 @@ void MixerPanel::toogleChannel(uint channel){
 }
 
 std::pair<uint, uint> MixerPanel::getChannelOffsets(){
-    uint left = 3;
-    uint right = 3;
+    auto left  = 3u;
+    auto right = 3u;
 
     switch (this->channel){
         case CHANNEL_LEFT:
@@ -257,9 +258,9 @@ std::pair<uint, uint> MixerPanel::getChannelOffsets(){
 }
 
 void MixerPanel::alignVolume(){
-    auto vol  = this->device.getVolume();
-    uint left  = vol.first;
-    uint right = vol.second;
+    auto vol   = this->device.getVolume();
+    auto left  = vol.first;
+    auto right = vol.second;
 
     if (left < right){
         left = right;

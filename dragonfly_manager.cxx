@@ -37,37 +37,33 @@ static const char *names[SOUND_MIXER_NRDEVICES] = SOUND_DEVICE_NAMES;
 
 DragonFlyManager::DragonFlyManager(std::string device) : MixerManager{device} {
 
-    uint volLeft  = 0;
-    uint volRight = 0;
+    auto volLeft  = 0u;
+    auto volRight = 0u;
 
-    int devmask = 0;
-    int recmask = 0;
-    int recsrc  = 0;
-    int bar;
+    auto devmask = 0;
+    auto recmask = 0;
+    auto recsrc  = 0;
+    auto bar     = 0;
 
     if ((this->deviceHndl = open(device.c_str(), O_RDWR)) < 0){
-        throw std::exception();
-        //throw std::exception("Could not open device \""+device+"\".");
+        throw "Could not open device \""+device+"\".";
         //err(1, "%s", name);
     }
     if (ioctl(this->deviceHndl, SOUND_MIXER_READ_DEVMASK, &devmask) == -1){
-        throw std::exception();
-        //throw std::exception("Could not read device mask.");
+        throw "Could not read device mask.";
         //err(1, "SOUND_MIXER_READ_DEVMASK");
     }
     if (ioctl(this->deviceHndl, SOUND_MIXER_READ_RECMASK, &recmask) == -1){
-        throw std::exception();
-        //throw std::exception("Could not read recording device mask.");
+        throw "Could not read recording device mask.";
         //err(1, "SOUND_MIXER_READ_RECMASK");
     }
     if (ioctl(this->deviceHndl, SOUND_MIXER_READ_RECSRC, &recsrc) == -1){
-        throw std::exception();
-        //throw std::exception("Could not read recording device.");
+        throw "Could not read recording device.";
         //err(1, "SOUND_MIXER_READ_RECSRC");
     }
     //int orecsrc = recsrc;
 
-    for(uint i=0; i < SOUND_MIXER_NRDEVICES; i++){
+    for(auto i=0u; i < SOUND_MIXER_NRDEVICES; i++){
         if (!((1 << i) & devmask))
             continue;
         if (ioctl(this->deviceHndl, MIXER_READ(i),&bar) == -1) {
@@ -78,12 +74,12 @@ DragonFlyManager::DragonFlyManager(std::string device) : MixerManager{device} {
         volRight = (bar >> 8) & 0x7f;
 
         MixerDevice dev{i, std::string(names[i]), volLeft, volRight};
-        this->mixers.push_back(dev);
+        this->mixers.push_back(std::move(dev));
     }
 }
 
 void DragonFlyManager::updateMixer(MixerDevice &mixer){
-    int vol = mixer.getVolumeLeft() | (mixer.getVolumeRight() << 8);	
+    auto vol = mixer.getVolumeLeft() | (mixer.getVolumeRight() << 8);	
     if (ioctl(this->deviceHndl, MIXER_WRITE(mixer.getNumber()), &vol) == -1){
         warn("WRITE_MIXER");
     }
