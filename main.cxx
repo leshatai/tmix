@@ -45,7 +45,7 @@ int main(int argc, char* argv[]){
         MixerWindow  window(mixerMgr);
         window.show();
     } catch(std::exception &e) {
-        std::cout << "Exception. Cannot start." << std::endl;
+        std::cout << "Cannot start due to exception. Reason: " << e.what() << std::endl;
     }
 
     return EXIT_SUCCESS;

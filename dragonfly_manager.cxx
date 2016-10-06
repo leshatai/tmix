@@ -29,6 +29,7 @@
 #include <err.h>
 #include <fcntl.h>
 #include <sys/soundcard.h>
+#include <stdexcept>
 
 #include "mixer_device.hpp"
 #include "dragonfly_manager.hpp"
@@ -46,20 +47,16 @@ DragonFlyManager::DragonFlyManager(std::string device) : MixerManager{device} {
     auto bar     = 0;
 
     if ((this->deviceHndl = open(device.c_str(), O_RDWR)) < 0){
-        throw "Could not open device \""+device+"\".";
-        //err(1, "%s", name);
+        throw std::runtime_error("Could not open device \""+device+"\".");
     }
     if (ioctl(this->deviceHndl, SOUND_MIXER_READ_DEVMASK, &devmask) == -1){
-        throw "Could not read device mask.";
-        //err(1, "SOUND_MIXER_READ_DEVMASK");
+        throw std::runtime_error("Could not read device mask.");
     }
     if (ioctl(this->deviceHndl, SOUND_MIXER_READ_RECMASK, &recmask) == -1){
-        throw "Could not read recording device mask.";
-        //err(1, "SOUND_MIXER_READ_RECMASK");
+        throw std::runtime_error("Could not read recording device mask.");
     }
     if (ioctl(this->deviceHndl, SOUND_MIXER_READ_RECSRC, &recsrc) == -1){
-        throw "Could not read recording device.";
-        //err(1, "SOUND_MIXER_READ_RECSRC");
+        throw std::runtime_error("Could not read recording device.");
     }
     //int orecsrc = recsrc;
 

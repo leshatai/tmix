@@ -34,6 +34,7 @@
 #include "mixer_device.hpp"
 
 #include <ncurses.h>
+#include <memory>
 
 class MixerPanel{
     protected:
@@ -57,8 +58,8 @@ class MixerPanel{
         uint pos;
         uint channel;
         MixerDevice &device;
-        WINDOW *labelWindow;
-        WINDOW *scaleWindow;
+        std::shared_ptr<WINDOW> labelWindow;
+        std::shared_ptr<WINDOW> scaleWindow;
 
         /**
          * Calculates the size of all windows, depending

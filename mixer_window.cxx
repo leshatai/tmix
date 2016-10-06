@@ -75,7 +75,7 @@ void MixerWindow::resize(){
     if (this->height != oldHeight){
         auto viewportHeight = this->height - PAD_HEIGHT_VIEWPORT;
         auto isBigger       = oldHeight < this->height;
-        WINDOW *viewport    = this->viewport.get();
+        auto *viewport    = this->viewport.get();
 
         werase(viewport);
         if (isBigger ){
