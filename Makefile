@@ -1,7 +1,9 @@
 #	@(#)Makefile	8.2 (Berkeley) 4/4/94
 
-PROG=	tmix
-MAN=	
+PROG=tmix
+MAN=tmix.1
+BINOWN=root
+BINMODE=4555
 SRCS=\
         dragonfly_manager.cxx \
         mixer_window.cxx \
@@ -28,13 +30,9 @@ CXXFLAGS += -g
 CXXFLAGS += -O3
 .endif
 
-DPADD=	${LIBNCURSES}
-LDADD=	-L/usr/local/lib -lncurses
+DPADD= ${LIBNCURSES}
+LDADD= -L/usr/local/lib -lncurses
 
-#LSDIR=	../../bin/ls
-#.PATH:	${.CURDIR}/${LSDIR}
+#install: install -m 555 -o root -g wheel obj/tmix
 
-#all: $(SRCS)
-
-#.include <bsd.subdir.mk>
 .include <bsd.prog.mk>
