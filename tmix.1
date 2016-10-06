@@ -1,0 +1,37 @@
+.TH TMIX 1
+.SH NAME
+tmix \- modify mixer volumes
+.SH SYNOPSIS
+.B tmix
+.IR [mixer]
+.SH DESCRIPTION
+.B tmix
+is a ncurses based program to adjust mixer volumes
+.SH ARGUMENTS
+.TP
+.BR mixer
+The mixer device name. If none is given \fI/dev/mixer\fR is used as default
+.SH KEYS
+.TP.
+.BR Up/Down
+Raise or lower volume
+.TP
+.BR Left/Right
+Select next/previous mixer
+.TP
+.BR PageUp/\-Down
+Go to next/previous mixer page. (This is only possible, if not all mixers
+can be shown on current screen)
+.TP
+.BR q
+Quit the program
+.TP
+.BR m
+(Un)Mute the selected mixer
+.TP
+.BR l,r,b
+Toogle L)eft, R)right or B)oth channels, when setting volumne
+.TP
+.BR a
+Align volume of both channels to the higher one
+
