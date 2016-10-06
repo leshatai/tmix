@@ -2,8 +2,7 @@
 
 PROG=tmix
 MAN=tmix.1
-BINOWN=root
-BINMODE=4555
+BINDIR=/usr/local/bin
 SRCS=\
         dragonfly_manager.cxx \
         mixer_window.cxx \
@@ -32,7 +31,5 @@ CXXFLAGS += -O3
 
 DPADD= ${LIBNCURSES}
 LDADD= -L/usr/local/lib -lncurses
-
-#install: install -m 555 -o root -g wheel obj/tmix
 
 .include <bsd.prog.mk>
