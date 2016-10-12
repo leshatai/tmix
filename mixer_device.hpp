@@ -33,6 +33,8 @@
 
 #include <string>
 
+typedef unsigned int uint;
+
 class MixerDevice {
     protected:
         uint nr;

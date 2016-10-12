@@ -72,8 +72,8 @@ void MixerDevice::decVolume(uint left, uint right){
     auto volLeft = this->volLeft - left;
     auto volRight = this->volRight - right;
 
-    volLeft  = volLeft  < 0 ? 0 : volLeft;
-    volRight = volRight < 0 ? 0 : volRight;
+    volLeft  = volLeft  == 0 ? 0 : volLeft;
+    volRight = volRight == 0 ? 0 : volRight;
 
     this->setVolume(volLeft, volRight);
 }

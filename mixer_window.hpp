@@ -153,11 +153,6 @@ class MixerWindow {
         MixerWindow(MixerManager &mgr);
 
         /**
-         * Std. destructor
-         */
-        ~MixerWindow();
-
-        /**
          * Shows the mixer window
          */
         void show();

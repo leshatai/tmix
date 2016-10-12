@@ -52,10 +52,6 @@ MixerWindow::MixerWindow(MixerManager &mgr) :
         this->initMixers();
     }
 
-MixerWindow::~MixerWindow(){
-    endwin();
-}
-
 void MixerWindow::show(){
     this->init();
     this->selectMixer(0);
@@ -193,6 +189,7 @@ void MixerWindow::handleInput(){
                 break;
             case 'q':
                 quit = true;
+                endwin();
                 break;
             default:
                 break;
@@ -201,7 +198,7 @@ void MixerWindow::handleInput(){
 }
 
 void MixerWindow::selectMixer(uint pos){
-    if (pos < 0 || pos > this->mixerPanels.size()-1){
+    if (pos > this->mixerPanels.size()-1){
         return;
     }
 
@@ -260,7 +257,7 @@ void MixerWindow::updateViewport(){
         this->curPanel->highlight();
     }
 
-    mvaddstr(1, 2, "Keys: 'q': Quit | 'm': Mute | 'l','r','b' : Toogle Channel | 'a' : Align Volume");
+    mvaddstr(1, 2, "Keys: 'q': Quit");
     this->updateScrollers();
     wnoutrefresh(stdscr);
     pnoutrefresh(this->viewport.get(), 0, viewportCol, 2, 2, viewportRows, viewCols);
